@@ -78,7 +78,7 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
 }
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
 
-/* ===== Gallery ===== */
+/* ===== App Screenshots ===== */
 .gallery{
   padding:60px 20px 40px;max-width:600px;margin:0 auto;
 }
@@ -89,30 +89,30 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
 .gallery-sub{
   font-size:14px;color:rgba(255,220,180,0.4);text-align:center;margin-bottom:36px;
 }
-.gallery-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+.shot-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
 }
-.gallery-item{
-  border-radius:18px;overflow:hidden;position:relative;
-  border:1px solid rgba(255,220,180,0.08);
+.shot-item{
+  border-radius:16px;overflow:hidden;position:relative;
+  border:1px solid rgba(255,220,180,0.1);
+  aspect-ratio:9/19.3;
   transition:transform .2s;
 }
-.gallery-item:active{transform:scale(0.98)}
-.gallery-item.tall{grid-row:span 2}
-.gallery-item img{
+.shot-item:active{transform:scale(0.97)}
+.shot-item img{
   width:100%;height:100%;object-fit:cover;display:block;
 }
-.gallery-item .caption{
+.shot-item .shot-label{
   position:absolute;bottom:0;left:0;right:0;
-  padding:20px 14px 12px;
-  background:linear-gradient(transparent,rgba(0,0,0,0.7));
-  font-size:12px;color:rgba(255,230,200,0.8);
-  text-align:center;letter-spacing:0.5px;
+  padding:16px 10px 8px;
+  background:linear-gradient(transparent,rgba(0,0,0,0.75));
+  font-size:11px;color:rgba(255,230,200,0.85);
+  text-align:center;letter-spacing:0.5px;font-weight:500;
 }
-.gallery-item.full{
-  grid-column:span 2;
-}
-.gallery-item.full img{max-height:280px}
+.shot-item.wide{grid-column:span 3;aspect-ratio:auto}
+.shot-item.wide .shot-row{display:flex;gap:0;align-items:stretch}
+.shot-item.wide .shot-row img{flex:1;aspect-ratio:9/19.3}
+.shot-item.wide .shot-label{position:relative;background:rgba(0,0,0,0.6);padding:8px}
 
 /* ===== Features ===== */
 .features{
@@ -202,6 +202,8 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
   .gallery-item.tall{grid-row:span 1}
   .gallery-item.full{grid-column:span 1}
   .gallery-item img{max-height:320px}
+  .shot-grid{grid-template-columns:1fr 1fr}
+  .shot-item.wide{grid-column:span 2}
 }
 </style>
 </head>
@@ -234,26 +236,34 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
   <div class="scroll-hint">向下滚动了解功能 ↓</div>
 </section>
 
-<!-- ===== Gallery ===== -->
+<!-- ===== App Screenshots ===== -->
 <section class="gallery">
-  <h2 class="gallery-title">看见光的力量</h2>
-  <p class="gallery-sub">暗光自拍 · 化妆镜级补光 · 一键出片</p>
-  <div class="gallery-grid">
-    <div class="gallery-item tall">
-      <img src="promo-images/promo-selfie-night.png" alt="暗光自拍补光">
-      <div class="caption">暗光环境也能拍出通透感</div>
+  <h2 class="gallery-title">真实界面 · 所见即所得</h2>
+  <p class="gallery-sub">以下均为 App 真实截图，非效果图</p>
+  <div class="shot-grid">
+    <div class="shot-item">
+      <img src="promo-images/app-light-off.png" alt="补光前">
+      <div class="shot-label">补光前</div>
     </div>
-    <div class="gallery-item">
-      <img src="promo-images/promo-product-shot.png" alt="灯管补光效果">
-      <div class="caption">边框灯管实时补光</div>
+    <div class="shot-item">
+      <img src="promo-images/app-warm-light.png" alt="暖光补光">
+      <div class="shot-label">暖光补光</div>
     </div>
-    <div class="gallery-item">
-      <img src="promo-images/promo-flatlay.png" alt="化妆台场景">
-      <div class="caption">你的随身化妆镜</div>
+    <div class="shot-item">
+      <img src="promo-images/app-cool-light.png" alt="冷光补光">
+      <div class="shot-label">冷光补光</div>
     </div>
-    <div class="gallery-item full">
-      <img src="promo-images/promo-vanity-selfie.png" alt="梳妆台自拍">
-      <div class="caption">暖光一开，氛围感拉满</div>
+    <div class="shot-item">
+      <img src="promo-images/app-color-wheel.png" alt="色环选色">
+      <div class="shot-label">色环选色</div>
+    </div>
+    <div class="shot-item">
+      <img src="promo-images/app-beauty-panel.png" alt="美颜面板">
+      <div class="shot-label">美颜面板</div>
+    </div>
+    <div class="shot-item">
+      <img src="promo-images/app-pro-mode.png" alt="Pro 超亮模式">
+      <div class="shot-label">Pro 超亮模式</div>
     </div>
   </div>
 </section>

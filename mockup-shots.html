@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>补光照相机 Mockup</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;
+  font-family:-apple-system,"SF Pro Display","PingFang SC",sans-serif;
+  user-select:none;-webkit-user-select:none}
+
+/* ===== Screen ===== */
+.screen{position:relative;width:100vw;height:100vh;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 45%,#1a1410,#0d0a08 70%,#060403);
+  touch-action:none}
+
+/* ===== Video placeholder ===== */
+.cam-feed{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;z-index:0;background:#0d0a08;
+}
+
+/* ===== Light Bath (inner glow) ===== */
+.bath{position:absolute;inset:0;z-index:3;pointer-events:none;
+  mix-blend-mode:screen;opacity:0.75}
+
+/* ===== Light Tube Frame ===== */
+.tube-frame{position:absolute;inset:0;z-index:5;pointer-events:none}
+.tube{position:absolute;background:#1a1410;border-radius:14px}
+.tube-inner{position:absolute;inset:3px;border-radius:11px;background:#221814;overflow:hidden}
+.tube-glow{position:absolute;inset:1px;border-radius:10px}
+
+.tube-top{top:8px;left:40px;right:40px;height:24px}
+.tube-top .tube-glow{box-shadow:0 6px 50px var(--glow),0 3px 20px var(--glow),0 0 80px var(--glow)}
+.tube-bottom{bottom:128px;left:40px;right:40px;height:24px}
+.tube-bottom .tube-glow{box-shadow:0 -6px 50px var(--glow),0 -3px 20px var(--glow),0 0 80px var(--glow)}
+.tube-left{top:40px;bottom:168px;left:8px;width:24px}
+.tube-left .tube-glow{box-shadow:6px 0 50px var(--glow),3px 0 20px var(--glow),0 0 80px var(--glow)}
+.tube-right{top:40px;bottom:168px;right:8px;width:24px}
+.tube-right .tube-glow{box-shadow:-6px 0 50px var(--glow),-3px 0 20px var(--glow),0 0 80px var(--glow)}
+
+.corner-glow{position:absolute;width:10px;height:10px;border-radius:50%;
+  background:var(--glow,transparent);opacity:0.2;filter:blur(6px);z-index:4;pointer-events:none}
+
+.tube-dots{position:absolute;inset:0;border-radius:10px;
+  background-image:radial-gradient(circle,rgba(255,255,255,0.18) 1px,transparent 1.5px);
+  background-size:8px 100%;background-repeat:repeat-x;opacity:0.3;pointer-events:none}
+.tube-left .tube-dots,.tube-right .tube-dots{
+  background-size:100% 8px;background-repeat:repeat-y}
+
+/* ===== Top Bar ===== */
+.top-bar{position:absolute;top:26px;left:0;right:0;z-index:40;
+  display:flex;justify-content:center;align-items:center;gap:6px;pointer-events:none}
+.brand{font-size:12px;font-weight:200;letter-spacing:5px;color:rgba(255,235,210,0.2);text-transform:uppercase}
+.pro-badge{display:inline-flex;align-items:center;gap:3px;
+  background:linear-gradient(135deg,#ffd700,#ffb347);color:#1a1410;
+  font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;letter-spacing:0.5px}
+
+/* ===== Value Pills ===== */
+.vals{position:absolute;top:58px;left:50%;transform:translateX(-50%);
+  display:flex;gap:6px;z-index:40;opacity:1;pointer-events:none}
+.val{padding:5px 14px;border-radius:18px;
+  background:rgba(18,14,12,0.75);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,220,180,0.07);
+  font-size:10.5px;color:rgba(255,220,180,0.3);
+  display:flex;align-items:center;gap:4px;font-weight:400;letter-spacing:0.3px}
+.val b{color:rgba(255,230,200,0.85);font-weight:500;font-size:11px}
+
+/* ===== Color Wheel ===== */
+.color-wheel{position:absolute;width:140px;height:140px;border-radius:50%;
+  background:conic-gradient(from 90deg,
+    hsl(0,75%,55%),hsl(30,80%,55%),hsl(45,85%,55%),
+    hsl(60,80%,55%),hsl(90,65%,50%),hsl(120,60%,45%),
+    hsl(150,60%,45%),hsl(180,65%,50%),hsl(200,75%,55%),
+    hsl(220,80%,58%),hsl(250,70%,60%),hsl(280,65%,55%),
+    hsl(310,70%,55%),hsl(340,75%,55%),hsl(360,75%,55%));
+  opacity:0;pointer-events:none;z-index:56;
+  mask:radial-gradient(circle,transparent 34px,#000 36px,#000 68px,transparent 70px);
+  -webkit-mask:radial-gradient(circle,transparent 34px,#000 36px,#000 68px,transparent 70px)}
+.color-wheel.show{opacity:0.95}
+.color-dot{position:absolute;width:18px;height:18px;border-radius:50%;
+  border:2.5px solid rgba(255,255,255,0.9);
+  box-shadow:0 0 8px rgba(0,0,0,0.5),0 0 4px rgba(255,255,255,0.3);
+  opacity:0;pointer-events:none;z-index:57;transform:translate(-50%,-50%)}
+.color-dot.show{opacity:1}
+
+/* ===== Beauty Panel ===== */
+.beauty-panel{position:absolute;left:50%;bottom:165px;transform:translateX(-50%) translateY(0) scale(1);
+  width:252px;padding:16px 20px 14px;border-radius:22px;
+  background:rgba(18,14,12,0.85);backdrop-filter:blur(28px) saturate(1.3);
+  border:1px solid rgba(255,220,180,0.1);z-index:55;opacity:1;pointer-events:auto;
+  box-shadow:0 16px 48px rgba(0,0,0,0.5)}
+.bp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.bp-title{font-size:14px;font-weight:500;color:rgba(255,230,200,0.7);letter-spacing:1px}
+.bp-close{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.06);
+  display:flex;align-items:center;justify-content:center;border:none;color:rgba(255,255,255,0.35)}
+.bp-row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.bp-row:last-child{margin-bottom:0}
+.bp-label{font-size:12px;color:rgba(255,220,180,0.45);width:30px;flex-shrink:0;font-weight:400}
+.bp-track{flex:1;height:32px;display:flex;align-items:center;position:relative}
+.bp-bar{width:100%;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;position:relative}
+.bp-fill{height:100%;background:linear-gradient(90deg,rgba(255,210,150,0.6),rgba(255,180,120,0.4));border-radius:2px}
+.bp-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;
+  background:linear-gradient(135deg,#fff,#f0d8c0);box-shadow:0 0 8px rgba(255,220,180,0.3),0 1px 3px rgba(0,0,0,0.2)}
+.bp-val{font-size:11px;color:rgba(255,220,180,0.3);width:24px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* ===== Bottom Controls ===== */
+.controls{position:absolute;bottom:0;left:0;right:0;height:120px;z-index:50;
+  display:flex;align-items:center;justify-content:center;pointer-events:none}
+.btn{position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;border:none;color:rgba(255,230,200,0.55)}
+.btn-light{bottom:38px;left:26px;width:46px;height:46px;border-radius:15px;
+  background:rgba(255,205,145,0.14);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,210,150,0.32);
+  box-shadow:0 0 18px rgba(255,210,150,0.18),inset 0 0 10px rgba(255,210,150,0.1);
+  color:rgba(255,225,180,0.95)}
+.btn-beauty{bottom:38px;left:84px;width:46px;height:46px;border-radius:15px;
+  background:rgba(255,180,200,0.12);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,180,200,0.32);color:rgba(255,200,215,0.95)}
+.btn-shutter{bottom:30px;left:50%;transform:translateX(-50%);width:66px;height:66px;border-radius:50%;
+  background:transparent;border:2.5px solid rgba(255,230,200,0.32)}
+.btn-shutter::after{content:'';position:absolute;inset:4px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(255,235,210,0.18),rgba(255,220,180,0.06));
+  border:1px solid rgba(255,230,200,0.18)}
+.btn-flip{bottom:38px;right:26px;width:46px;height:46px;border-radius:15px;
+  background:rgba(22,18,14,0.72);backdrop-filter:blur(16px);border:1px solid rgba(255,220,180,0.09)}
+.btn-pro{bottom:38px;right:84px;width:46px;height:46px;border-radius:15px;
+  background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,179,71,0.08));
+  border:1px solid rgba(255,215,0,0.25);color:rgba(255,215,0,0.8)}
+
+/* ===== Boost overlay ===== */
+.boost-overlay{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:0}
+.boost-overlay.on{opacity:0.6}
+.boost-overlay::before{content:'';position:absolute;inset:0;border:24px solid #fff;border-radius:0;
+  box-shadow:inset 0 0 60px rgba(255,255,255,0.3);
+  mask:linear-gradient(0deg,transparent 40px,#000 42px,#000 calc(100% - 170px),transparent calc(100% - 168px)),
+      linear-gradient(90deg,transparent 40px,#000 42px,#000 calc(100% - 42px),transparent calc(100% - 40px));
+  -webkit-mask:linear-gradient(0deg,transparent 40px,#000 42px,#000 calc(100% - 170px),transparent calc(100% - 168px)),
+      linear-gradient(90deg,transparent 40px,#000 42px,#000 calc(100% - 42px),transparent calc(100% - 40px));
+  -webkit-mask-composite:source-in;mask-composite:intersect}
+
+/* ===== Config (set via URL param) ===== */
+.mockup-config{display:none}
+</style>
+</head>
+<body>
+
+<div class="screen" id="screen">
+  <img class="cam-feed" id="camFeed" src="" crossorigin="anonymous">
+  <div class="bath" id="bath"></div>
+  <div class="tube-frame" id="tubeFrame">
+    <div class="tube tube-top"><div class="tube-inner"><div class="tube-glow"></div><div class="tube-dots"></div></div></div>
+    <div class="tube tube-bottom"><div class="tube-inner"><div class="tube-glow"></div><div class="tube-dots"></div></div></div>
+    <div class="tube tube-left"><div class="tube-inner"><div class="tube-glow"></div><div class="tube-dots"></div></div></div>
+    <div class="tube tube-right"><div class="tube-inner"><div class="tube-glow"></div><div class="tube-dots"></div></div></div>
+    <div class="corner-glow" style="top:8px;left:8px"></div>
+    <div class="corner-glow" style="top:8px;right:8px"></div>
+    <div class="corner-glow" style="bottom:128px;left:8px"></div>
+    <div class="corner-glow" style="bottom:128px;right:8px"></div>
+  </div>
+  <div class="boost-overlay" id="boostOverlay"></div>
+  <div class="top-bar">
+    <div class="brand">补光照相机</div>
+    <div class="pro-badge" id="proBadge" style="display:none">PRO</div>
+  </div>
+  <div class="vals" id="vals">
+    <div class="val">亮度 <b id="vB">100</b></div>
+    <div class="val">色温 <b id="vT">暖光</b></div>
+    <div class="val">色彩 <b id="vH">暖白</b></div>
+  </div>
+  <!-- Color wheel (shown only in color mode) -->
+  <div class="color-wheel" id="colorWheel"></div>
+  <div class="color-dot" id="colorDot"></div>
+  <!-- Beauty panel (shown only in beauty mode) -->
+  <div class="beauty-panel" id="beautyPanel" style="opacity:0;display:none">
+    <div class="bp-header">
+      <div class="bp-title">美颜</div>
+      <div class="bp-close">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg>
+      </div>
+    </div>
+    <div class="bp-row"><span class="bp-label">磨皮</span><div class="bp-track"><div class="bp-bar"><div class="bp-fill" style="width:60%"></div><div class="bp-thumb" style="left:60%"></div></div></div><span class="bp-val">60</span></div>
+    <div class="bp-row"><span class="bp-label">美白</span><div class="bp-track"><div class="bp-bar"><div class="bp-fill" style="width:40%"></div><div class="bp-thumb" style="left:40%"></div></div></div><span class="bp-val">40</span></div>
+    <div class="bp-row"><span class="bp-label">瘦脸</span><div class="bp-track"><div class="bp-bar"><div class="bp-fill" style="width:30%"></div><div class="bp-thumb" style="left:30%"></div></div></div><span class="bp-val">30</span></div>
+    <div class="bp-row"><span class="bp-label">大眼</span><div class="bp-track"><div class="bp-bar"><div class="bp-fill" style="width:50%"></div><div class="bp-thumb" style="left:50%"></div></div></div><span class="bp-val">50</span></div>
+  </div>
+  <div class="controls">
+    <button class="btn btn-light" id="btnLight">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18h6"/><path d="M10 21.5h4"/>
+        <path d="M12 2a7 7 0 0 0-4.5 12.3c.5.4.8 1 .9 1.7h7.2c.1-.7.4-1.3.9-1.7A7 7 0 0 0 12 2z"/>
+      </svg>
+    </button>
+    <button class="btn btn-beauty" id="btnBeauty">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2.5l2.2 6.3 6.3 2.2-6.3 2.2-2.2 6.3-2.2-6.3L3.5 11l6.3-2.2z"/>
+        <path d="M18.5 3.5v3M20 5h-3M5.5 16.5v2.5M6.75 17.75h-2.5"/>
+      </svg>
+    </button>
+    <button class="btn btn-shutter" id="btnShutter"></button>
+    <button class="btn btn-flip" id="btnFlip">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.5 9a8.5 8.5 0 0 1 13.5-3.5L20 8"/><path d="M20 4.5V8h-3.5"/>
+        <path d="M20.5 15a8.5 8.5 0 0 1-13.5 3.5L4 16"/><path d="M4 19.5V16h3.5"/>
+      </svg>
+    </button>
+    <button class="btn btn-pro" id="btnPro">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// Parse URL params for scene config
+var params = new URLSearchParams(location.search);
+var scene = params.get('scene') || 'warm';
+var imgNum = params.get('img') || '1';
+
+// Stock portrait photos (Unsplash - free to use)
+var stockImages = {
+  '1': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=1400&fit=crop',  // woman selfie
+  '2': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=800&h=1400&fit=crop',  // woman portrait
+  '3': 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=800&h=1400&fit=crop',  // man portrait
+  '4': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&h=1400&fit=crop',  // woman face
+  '5': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&h=1400&fit=crop',  // woman selfie
+  '6': 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800&h=1400&fit=crop',  // woman portrait
+};
+
+document.getElementById('camFeed').src = stockImages[imgNum] || stockImages['1'];
+
+// Scene configurations
+var scenes = {
+  // Warm light, high brightness
+  warm: {
+    brightness: 120, temp: -50, hue: -1, sat: 0,
+    tempLabel: '暖光', hueLabel: '暖白',
+    showBeauty: false, showWheel: false, showPro: false,
+    boost: true
+  },
+  // Cool light
+  cool: {
+    brightness: 100, temp: 40, hue: -1, sat: 0,
+    tempLabel: '冷光', hueLabel: '暖白',
+    showBeauty: false, showWheel: false, showPro: false,
+    boost: false
+  },
+  // Color wheel - pink light
+  color: {
+    brightness: 110, temp: -35, hue: 330, sat: 55,
+    tempLabel: '微暖', hueLabel: '玫红',
+    showBeauty: false, showWheel: true, showPro: false,
+    boost: false
+  },
+  // Beauty panel open
+  beauty: {
+    brightness: 100, temp: -35, hue: -1, sat: 0,
+    tempLabel: '微暖', hueLabel: '暖白',
+    showBeauty: true, showWheel: false, showPro: false,
+    boost: false
+  },
+  // Pro unlocked, warm light max
+  pro: {
+    brightness: 150, temp: -50, hue: -1, sat: 0,
+    tempLabel: '暖光', hueLabel: '暖白',
+    showBeauty: false, showWheel: false, showPro: true,
+    boost: true
+  },
+  // No light (off state)
+  off: {
+    brightness: 70, temp: -35, hue: -1, sat: 0,
+    tempLabel: '微暖', hueLabel: '暖白',
+    showBeauty: false, showWheel: false, showPro: false,
+    boost: false,
+    power: false
+  }
+};
+
+var cfg = scenes[scene] || scenes.warm;
+
+// Apply configuration
+function tempRGB(t) {
+  if (t < 0) { var w = t / 180; return { r: 255, g: Math.round(255 + w * 100), b: Math.round(255 + w * 210) }; }
+  var n = t / 100; return { r: Math.round(255 - n * 35), g: Math.round(255 - n * 12), b: 255 };
+}
+function hsl2rgb(h, s, l) {
+  s /= 100; l /= 100;
+  var k = function(n) { return (n + h / 30) % 12; };
+  var a = s * Math.min(l, 1 - l);
+  var f = function(n) { return l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)); };
+  return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+}
+function getRGB() {
+  if (cfg.hue < 0 || cfg.sat < 3) return tempRGB(cfg.temp);
+  var rgb = hsl2rgb(cfg.hue, Math.min(55, cfg.sat), 60);
+  return { r: rgb[0], g: rgb[1], b: rgb[2] };
+}
+
+function applyScene() {
+  var c = getRGB();
+  var b = cfg.brightness / 100;
+  var frame = document.getElementById('tubeFrame');
+  var glows = document.querySelectorAll('.tube-glow');
+  var boost = document.getElementById('boostOverlay');
+
+  // Update value pills
+  document.getElementById('vB').textContent = cfg.brightness;
+  document.getElementById('vT').textContent = cfg.tempLabel;
+  document.getElementById('vH').textContent = cfg.hueLabel;
+
+  if (cfg.power === false) {
+    frame.classList.add('off');
+    glows.forEach(function(el) { el.style.opacity = '0.08'; el.style.background = '#3a3028'; el.style.boxShadow = 'none'; });
+    document.getElementById('bath').style.opacity = '0';
+    document.getElementById('btnLight').classList.remove('on');
+    document.getElementById('btnLight').style.background = 'rgba(22,18,14,0.72)';
+    document.getElementById('btnLight').style.borderColor = 'rgba(255,220,180,0.09)';
+    document.getElementById('btnLight').style.color = 'rgba(255,230,200,0.55)';
+    return;
+  }
+
+  var r = c.r, g = c.g, bl = c.b;
+  if (b > 1) {
+    var blend = (b - 1) * 0.6;
+    r = Math.round(r + (255 - r) * blend);
+    g = Math.round(g + (255 - g) * blend);
+    bl = Math.round(bl + (255 - bl) * blend);
+  }
+  var glowAlpha = Math.min(1, 0.5 + b * 0.45);
+  var glowColor = 'rgba(' + r + ',' + g + ',' + bl + ',' + glowAlpha + ')';
+  var innerAlpha1 = Math.min(1, 0.85 + b * 0.15);
+  var innerAlpha2 = Math.min(1, 0.7 + b * 0.3);
+  var innerColor = 'linear-gradient(135deg,' +
+    'rgba(' + Math.min(255, r + 30) + ',' + Math.min(255, g + 25) + ',' + Math.min(255, bl + 20) + ',' + innerAlpha1 + '),' +
+    'rgba(' + r + ',' + g + ',' + bl + ',' + innerAlpha2 + '))';
+
+  document.documentElement.style.setProperty('--glow', glowColor);
+
+  glows.forEach(function(el) {
+    el.style.background = innerColor;
+    el.style.opacity = Math.min(1, 0.8 + b * 0.2);
+    el.style.filter = b > 1 ? 'brightness(' + (1 + (b - 1) * 1.0) + ')' : '';
+  });
+
+  // Bath
+  var bathA = Math.min(0.72, b * 0.32);
+  var bathB = Math.min(0.5, b * 0.22);
+  document.getElementById('bath').style.background =
+    'radial-gradient(ellipse 80% 50% at 50% 0%,rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + bathA + ') 0%,transparent 60%),' +
+    'radial-gradient(ellipse 80% 40% at 50% 86%,rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (bathA * 0.7) + ') 0%,transparent 50%),' +
+    'radial-gradient(ellipse 50% 70% at 0% 50%,rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + bathB + ') 0%,transparent 40%),' +
+    'radial-gradient(ellipse 50% 70% at 100% 50%,rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + bathB + ') 0%,transparent 40%)';
+
+  // Boost
+  if (cfg.boost) { boost.classList.add('on'); }
+
+  // Color wheel
+  if (cfg.showWheel) {
+    var wheel = document.getElementById('colorWheel');
+    var dot = document.getElementById('colorDot');
+    var btn = document.getElementById('btnLight');
+    // Position wheel near light button
+    wheel.style.left = '26px';
+    wheel.style.bottom = '100px';
+    wheel.style.top = '';
+    wheel.classList.add('show');
+    // Position dot
+    if (cfg.hue >= 0) {
+      var rad = cfg.hue * Math.PI / 180;
+      var cx = 26 + 23; // btn left + half width
+      var cy = 0; // will calculate from bottom
+      dot.style.left = (cx + 52 * Math.cos(rad) + 70 - 23) + 'px';
+      dot.style.bottom = (100 + 70 - 52 * Math.sin(rad) - 23) + 'px';
+      dot.style.top = '';
+      dot.style.background = 'rgb(' + c.r + ',' + c.g + ',' + c.b + ')';
+      dot.classList.add('show');
+    }
+  }
+
+  // Beauty panel
+  if (cfg.showBeauty) {
+    var panel = document.getElementById('beautyPanel');
+    panel.style.opacity = '1';
+    panel.style.display = 'block';
+    document.getElementById('btnBeauty').classList.add('on');
+  }
+
+  // Pro badge
+  if (cfg.showPro) {
+    document.getElementById('proBadge').style.display = 'inline-flex';
+    document.getElementById('btnPro').classList.add('on');
+  }
+}
+
+// Wait for image to load, then apply scene
+document.getElementById('camFeed').onload = function() {
+  applyScene();
+};
+// Fallback: apply after 3s even if image hasn't loaded
+setTimeout(applyScene, 3000);
+</script>
+</body>
+</html>
