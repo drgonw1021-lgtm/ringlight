@@ -1,4 +1,4 @@
-var CACHE_NAME = 'ringlight-v3';
+var CACHE_NAME = 'ringlight-v4';
 var ASSETS = [
   './',
   './index.html',
@@ -10,7 +10,11 @@ var ASSETS = [
   './icon-maskable-512.png',
   './apple-touch-icon.png',
   './favicon-32.png',
-  './privacy-policy.html'
+  './privacy-policy.html',
+  './download.html',
+  './code-generator.html',
+  './alipay-qr-code.jpg',
+  './qr-code.png'
 ];
 
 self.addEventListener('install', function(e) {

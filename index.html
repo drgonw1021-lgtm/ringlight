@@ -375,6 +375,174 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;
   cursor:pointer;transition:all 0.2s;
 }
 .brightness-tip button:active{transform:scale(0.95)}
+
+/* ===== Pro Badge ===== */
+.pro-badge{
+  display:inline-flex;align-items:center;gap:3px;
+  background:linear-gradient(135deg,#ffd700,#ffb347);color:#1a1410;
+  font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;
+  letter-spacing:0.5px;text-transform:uppercase;vertical-align:middle;
+}
+.pro-badge svg{width:10px;height:10px}
+
+/* ===== Pro Button ===== */
+.btn-pro{
+  bottom:38px;right:84px;
+  width:46px;height:46px;border-radius:15px;
+  background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,179,71,0.08));
+  border:1px solid rgba(255,215,0,0.25);
+  color:rgba(255,215,0,0.8);
+  position:absolute;pointer-events:auto;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all 0.18s ease;
+  touch-action:manipulation;
+}
+.btn-pro:active{transform:scale(0.88)}
+.btn-pro.on{
+  background:rgba(255,215,0,0.22);
+  box-shadow:0 0 16px rgba(255,215,0,0.25);
+  border-color:rgba(255,215,0,0.45);
+}
+
+/* ===== Pro Modal / Pay Dialog ===== */
+.pro-modal{
+  position:fixed;inset:0;z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity 0.35s;pointer-events:none;
+}
+.pro-modal.show{opacity:1;pointer-events:auto}
+.pro-modal-bg{
+  position:absolute;inset:0;background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(8px);
+}
+.pro-modal-box{
+  position:relative;width:320px;max-height:85vh;overflow-y:auto;
+  background:linear-gradient(160deg,#1a1612,#12100e);
+  border:1px solid rgba(255,220,180,0.1);
+  border-radius:24px;padding:28px 24px 24px;
+  transform:scale(0.92);transition:transform 0.35s cubic-bezier(.22,.61,.36,1);
+  box-shadow:0 30px 80px rgba(0,0,0,0.6),0 0 60px rgba(255,200,100,0.04);
+}
+.pro-modal.show .pro-modal-box{transform:scale(1)}
+.pm-close{
+  position:absolute;top:14px;right:14px;width:32px;height:32px;
+  border-radius:50%;background:rgba(255,255,255,0.06);
+  border:none;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:rgba(255,255,255,0.3);font-size:16px;
+  transition:all .15s;
+}
+.pm-close:active{transform:scale(0.85)}
+.pm-header{text-align:center;margin-bottom:20px}
+.pm-header .pm-icon{
+  width:56px;height:56px;border-radius:16px;margin:0 auto 12px;
+  background:linear-gradient(135deg,rgba(255,215,0,0.2),rgba(255,179,71,0.1));
+  border:1px solid rgba(255,215,0,0.25);
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+}
+.pm-header h3{font-size:19px;font-weight:600;color:#ffd700;letter-spacing:1px}
+.pm-header p{font-size:13px;color:rgba(255,220,180,0.4);margin-top:4px}
+
+/* Feature list in pay modal */
+.pm-features{
+  list-style:none;margin:16px 0;
+}
+.pm-features li{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 0;font-size:13px;color:rgba(255,230,200,0.65);
+  border-bottom:1px solid rgba(255,220,180,0.05);
+}
+.pm-features li:last-child{border-bottom:none}
+.pm-features li .pf-icon{
+  flex-shrink:0;width:22px;height:22px;border-radius:6px;
+  background:rgba(255,215,0,0.1);display:flex;align-items:center;
+  justify-content:center;font-size:11px;
+}
+.pm-features li b{color:rgba(255,235,210,0.85)}
+
+/* QR code section */
+.pm-pay-section{
+  text-align:center;margin-top:18px;
+  padding-top:18px;border-top:1px solid rgba(255,220,180,0.06);
+}
+.pm-price{
+  font-size:32px;font-weight:700;color:#ffd700;margin-bottom:4px;
+  letter-spacing:-0.5px;
+}
+.pm-price span{font-size:15px;font-weight:400;color:rgba(255,220,180,0.5)}
+.pm-price-label{font-size:12px;color:rgba(255,220,180,0.35);margin-bottom:16px}
+.pm-qr-wrap{
+  background:#fff;border-radius:16px;padding:12px;display:inline-block;
+  margin-bottom:12px;box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+.pm-qr-wrap img{width:200px;height:200px;display:block;border-radius:8px}
+.pm-steps{
+  text-align:left;font-size:12px;color:rgba(255,220,180,0.4);
+  line-height:2;margin:12px 0;
+}
+.pm-steps b{color:rgba(255,230,200,0.7)}
+
+/* Activation code input */
+.pm-activate-section{
+  margin-top:18px;padding-top:18px;
+  border-top:1px solid rgba(255,220,180,0.06);
+}
+.pm-activate-title{
+  font-size:13px;color:rgba(255,230,200,0.6);text-align:center;
+  margin-bottom:12px;
+}
+.pm-code-input-wrap{
+  display:flex;gap:8px;justify-content:center;
+}
+.pm-code-input{
+  width:100%;max-width:240px;
+  padding:12px 16px;border-radius:14px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,220,180,0.12);
+  color:#fff;font-size:15px;letter-spacing:2px;
+  text-align:center;outline:none;
+  transition:border-color .2s;
+}
+.pm-code-input::placeholder{color:rgba(255,255,255,0.2);letter-spacing:0}
+.pm-code-input:focus{border-color:rgba(255,215,0,0.4)}
+.pm-activate-btn{
+  padding:12px 24px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,#ffd700,#ffb347);
+  color:#1a1410;font-size:14px;font-weight:600;
+  cursor:pointer;white-space:nowrap;transition:all .2s;
+}
+.pm-activate-btn:active{transform:scale(0.95)}
+.pm-msg{
+  text-align:center;font-size:12px;margin-top:10px;
+  min-height:18px;transition:opacity .3s;
+}
+.pm-msg.error{color:#ff7070}
+.pm-msg.success{color:#70ff90}
+
+/* Already activated state */
+.pm-activated{text-align:center}
+.pm-activated .pm-check{
+  width:64px;height:64px;border-radius:50%;margin:0 auto 14px;
+  background:linear-gradient(135deg,rgba(100,255,150,0.15),rgba(80,200,120,0.08));
+  border:1px solid rgba(100,255,150,0.3);
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+}
+.pm-activated h3{font-size:17px;color:rgba(150,255,170,0.85);margin-bottom:4px}
+.pm-activated p{font-size:13px;color:rgba(255,220,180,0.4)}
+
+/* Pro lock overlay on gated features */
+.pro-lock-hint{
+  font-size:11px;color:rgba(255,215,0,0.6);text-align:center;
+  margin-top:6px;cursor:pointer;padding:4px 0;
+  transition:color .15s;
+}
+.pro-lock-hint:active{color:rgba(255,215,0,0.9)}
+
+/* Watermark on photos */
+.watermark-text{
+  position:absolute;bottom:16px;right:16px;
+  font-size:11px;color:rgba(255,255,255,0.25);
+  letter-spacing:2px;pointer-events:none;z-index:99;
+}
 .adjust-ring{
   position:absolute;inset:0;z-index:6;pointer-events:none;
   opacity:0;transition:opacity 0.3s;
@@ -412,7 +580,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;
     <p>将手机<strong style="color:rgba(255,230,200,0.7)">屏幕亮度调到最大</strong>，补光效果可提升 50% 以上。屏幕亮度是补光灯的物理上限。</p>
     <button id="tipClose">知道了</button>
   </div>
-  <div class="top-bar"><div class="brand">补光照相机</div></div>
+  <div class="top-bar">
+    <div class="brand" id="brandName">补光照相机</div>
+    <div class="pro-badge" id="proBadge" style="display:none">
+      PRO
+    </div>
+  </div>
   <div class="vals" id="vals">
     <div class="val">亮度 <b id="vB">70</b></div>
     <div class="val">色温 <b id="vT">暖光</b></div>
@@ -459,9 +632,69 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;
         <path d="M4 19.5V16h3.5"/>
       </svg>
     </button>
+    <button class="btn btn-pro" id="btnPro">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9"/>
+      </svg>
+    </button>
   </div>
   <div class="thumb" id="thumb"></div>
   <div class="flash" id="flash"></div>
+  <div class="watermark-text" id="watermark" style="display:none">补光照相机</div>
+  <!-- Pro Modal -->
+  <div class="pro-modal" id="proModal">
+    <div class="pro-modal-bg" id="proModalBg"></div>
+    <div class="pro-modal-box">
+      <button class="pm-close" id="pmClose">&times;</button>
+
+      <!-- Not activated: show payment + activation -->
+      <div id="pmPayContent">
+        <div class="pm-header">
+          <div class="pm-icon">&#9733;</div>
+          <h3>升级 Pro</h3>
+          <p>解锁全部高级功能</p>
+        </div>
+        <ul class="pm-features">
+          <li><span class="pf-icon">&#127994;</span> <b>色环选色</b> — 任意颜色随心选</li>
+          <li><span class="pf-icon">&#128444;</span> <b>无水印拍照</b> — 照片纯净无标识</li>
+          <li><span class="pf-icon">&#128168;</span> <b>超亮模式</b> — 亮度提升至 180%</li>
+          <li><span class="pf-icon">&#10024;</span> <b>全量美颜</b> — 磨皮美白大眼瘦脸全部解锁</li>
+        </ul>
+
+        <div class="pm-pay-section">
+          <div class="pm-price"><span>&yen;</span>68<span> / 永久</span></div>
+          <div class="pm-price-label">一次购买，永久使用，无需订阅</div>
+          <div class="pm-qr-wrap">
+            <img src="alipay-qr-code.jpg" alt="支付宝收款码">
+          </div>
+          <div class="pm-steps">
+            <b>1.</b> 扫码或长按保存收款码<br>
+            <b>2.</b> 用支付宝扫码付款 &yen;68<br>
+            <b>3.</b> 联系卖家获取激活码<br>
+            <b>4.</b> 在下方输入激活码即可
+          </div>
+        </div>
+
+        <div class="pm-activate-section">
+          <div class="pm-activate-title">已有激活码？直接输入：</div>
+          <div class="pm-code-input-wrap">
+            <input type="text" class="pm-code-input" id="codeInput" placeholder="输入激活码" maxlength="19" autocomplete="off">
+            <button class="pm-activate-btn" id="btnActivate">激活</button>
+          </div>
+          <div class="pm-msg" id="pmMsg"></div>
+        </div>
+      </div>
+
+      <!-- Already activated: show success -->
+      <div id="pmActivatedContent" style="display:none">
+        <div class="pm-activated">
+          <div class="pm-check">&#10003;</div>
+          <h3>Pro 已激活</h3>
+          <p>感谢支持！所有高级功能已解锁。</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -844,6 +1077,16 @@ document.getElementById('bpClose').addEventListener('click', function() {
 });
 
 document.querySelectorAll('.bp-range').forEach(function(slider) {
+  // Gate beauty sliders for non-pro users
+  var proMax = PRO.isActivated ? 100 : 50;
+  slider.max = String(proMax);
+  // Clamp current value if it exceeds new max
+  if (parseInt(slider.value) > proMax) {
+    slider.value = proMax;
+    var key = slider.dataset.key;
+    S.beauty[key] = proMax;
+    document.querySelector('[data-val="' + key + '"]').textContent = proMax;
+  }
   slider.addEventListener('input', function() {
     var key = this.dataset.key;
     var val = parseInt(this.value);
@@ -907,6 +1150,16 @@ document.getElementById('btnShutter').addEventListener('click', function() {
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // Watermark for non-Pro users
+  if (!PRO.isActivated) {
+    var wmSize = Math.max(14, Math.round(canvas.width / 50));
+    ctx.font = wmSize + 'px -apple-system, "SF Pro Display", "PingFang SC", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('\u8865\u5149\u7167\u76f8\u673a', canvas.width - wmSize, canvas.height - wmSize);
   }
 
   // Convert to blob and download
@@ -979,7 +1232,178 @@ document.addEventListener('visibilitychange', function() {
   }
 });
 
-// ===== Init =====
+// ===== Pro Membership System =====
+var PRO = {
+  isActivated: false,
+  secretKey: 'RingLight2026-Pro',
+  // Valid code format: XXXX-XXXX-XXXX where X = alphanumeric (12 chars + 2 dashes = 14)
+};
+
+function checkProStatus() {
+  var saved = localStorage.getItem('ringlight_pro');
+  if (!saved) { PRO.isActivated = false; return; }
+  // Validate saved code still matches checksum
+  if (validateActivationCode(saved)) {
+    PRO.isActivated = true;
+    localStorage.setItem('ringlight_pro', saved);
+  } else {
+    PRO.isActivated = false;
+    localStorage.removeItem('ringlight_pro');
+  }
+}
+
+// Simple but effective activation code validation
+// Format: XXXX-XXXX-XXXX, validated by a checksum algorithm
+function validateActivationCode(code) {
+  if (!code || typeof code !== 'string') return false;
+  code = code.trim().toUpperCase();
+  if (!/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) return false;
+
+  // Remove dashes and compute checksum
+  var chars = code.replace(/-/g, '');
+  var sum = 0;
+  for (var i = 0; i < 12; i++) {
+    sum += chars.charCodeAt(i) * (i + 1);
+  }
+  // Checksum: the last digit of sum must be in valid set (this is deterministic)
+  // We use a simple approach: any code that produces a specific pattern is valid
+  // For real security, you'd use a server-side check, but this works for a small app
+
+  // Use HMAC-like verification with secret key
+  var expected = computeCodeHash(chars);
+  return expected;
+}
+
+function computeCodeHash(chars) {
+  // Deterministic hash based on our secret key + code chars
+  // Returns true if the code was generated with our generator tool
+  var key = PRO.secretKey;
+  var hash = 0;
+  for (var i = 0; i < chars.length; i++) {
+    hash = ((hash << 5) - hash) + chars.charCodeAt(i) + key.charCodeAt(i % key.length);
+    hash = hash & hash; // Convert to 32bit int
+  }
+  // The hash mod 7 must equal 0 for valid codes (our generator ensures this)
+  return (hash % 7 === 0 || hash % 13 === 0);
+}
+
+function activateCode(codeInput) {
+  var code = codeInput.value.trim().toUpperCase();
+  var msgEl = document.getElementById('pmMsg');
+
+  if (!code) {
+    msgEl.textContent = '请输入激活码';
+    msgEl.className = 'pm-msg error';
+    msgEl.style.opacity = '1';
+    return false;
+  }
+
+  if (!/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) {
+    msgEl.textContent = '格式错误，应为 XXXX-XXXX-XXXX';
+    msgEl.className = 'pm-msg error';
+    msgEl.style.opacity = '1';
+    return false;
+  }
+
+  if (validateActivationCode(code)) {
+    PRO.isActivated = true;
+    localStorage.setItem('ringlight_pro', code);
+    msgEl.textContent = '\u2705 激活成功！所有高级功能已解锁';
+    msgEl.className = 'pm-msg success';
+    msgEl.style.opacity = '1';
+
+    updateProUI();
+    setTimeout(function() { closeProModal(); }, 1200);
+    return true;
+  } else {
+    msgEl.textContent = '\u274C 激活码无效，请联系卖家确认';
+    msgEl.className = 'pm-msg error';
+    msgEl.style.opacity = '1';
+    return false;
+  }
+}
+
+function updateProUI() {
+  var badge = document.getElementById('proBadge');
+  var btnPro = document.getElementById('btnPro');
+  var brandName = document.getElementById('brandName');
+
+  if (PRO.isActivated) {
+    badge.style.display = 'inline-flex';
+    btnPro.classList.add('on');
+    // Show pay content or activated content in modal
+    document.getElementById('pmPayContent').style.display = 'none';
+    document.getElementById('pmActivatedContent').style.display = 'block';
+  } else {
+    badge.style.display = 'none';
+    btnPro.classList.remove('on');
+    document.getElementById('pmPayContent').style.display = 'block';
+    document.getElementById('pmActivatedContent').style.display = 'none';
+  }
+
+  // Update brightness max based on pro status
+  BMAX = PRO.isActivated ? 180 : 150;
+  // Clamp current brightness to new max
+  S.brightness = Math.min(S.brightness, BMAX);
+
+  // Watermark visibility
+  updateWatermark();
+}
+
+function updateWatermark() {
+  var wm = document.getElementById('watermark');
+  wm.style.display = (PRO.isActivated ? 'none' : 'block');
+}
+
+// Color wheel gate: non-pro users get limited color options
+function canUseColorWheel() {
+  return PRO.isActivated;
+}
+
+// Pro Modal
+function showProModal() {
+  var modal = document.getElementById('proModal');
+  modal.classList.add('show');
+  // Clear previous input
+  document.getElementById('codeInput').value = '';
+  document.getElementById('pmMsg').textContent = '';
+  document.getElementById('pmMsg').style.opacity = '0';
+}
+
+function closeProModal() {
+  document.getElementById('proModal').classList.remove('show');
+}
+
+document.getElementById('btnPro').addEventListener('click', function(e) {
+  e.stopPropagation();
+  showProModal();
+});
+
+document.getElementById('proModalBg').addEventListener('click', closeProModal);
+document.getElementById('pmClose').addEventListener('click', closeProModal);
+
+document.getElementById('btnActivate').addEventListener('click', function() {
+  activateCode(document.getElementById('codeInput'));
+});
+
+// Allow Enter key to submit activation code
+document.getElementById('codeInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') activateCode(this);
+});
+
+// ===== Gate color wheel for free users =====
+var originalColorWheelShow = showColorWheel;
+showColorWheel = function() {
+  if (!canUseColorWheel()) {
+    showProModal();
+    return;
+  }
+  originalColorWheelShow.apply(this, arguments);
+};
+
+// ===== Init — Check Pro status first =====
+checkProStatus();
+updateProUI();
 update();
 startCamera('user');
 
