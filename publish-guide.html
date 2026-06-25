@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RingLight 上架 & 变现指南</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"SF Pro Display","PingFang SC",sans-serif;background:#0d0a08;color:#e8ddd0;line-height:1.8;padding:40px 20px}
+.container{max-width:800px;margin:0 auto}
+h1{font-size:28px;color:#ffe0c0;margin-bottom:8px;letter-spacing:1px}
+h2{font-size:22px;color:#ffd0a0;margin:32px 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(255,220,180,0.15)}
+h3{font-size:17px;color:#ffc890;margin:20px 0 8px}
+p{margin:8px 0;color:#d0c5b8}
+.step{background:rgba(255,220,180,0.04);border:1px solid rgba(255,220,180,0.1);border-radius:12px;padding:20px;margin:12px 0}
+.step-num{display:inline-block;width:28px;height:28px;border-radius:50%;background:rgba(255,210,150,0.15);color:#ffe0c0;text-align:center;line-height:28px;font-weight:bold;margin-right:8px;font-size:14px}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;font-weight:bold;margin-left:6px}
+.badge-free{background:rgba(100,200,100,0.2);color:#80d080}
+.badge-paid{background:rgba(200,150,100,0.2);color:#d0a070}
+.badge-important{background:rgba(255,100,100,0.2);color:#e08080}
+.badge-optional{background:rgba(150,150,200,0.2);color:#a0a0d0}
+code{background:rgba(255,220,180,0.08);padding:2px 6px;border-radius:4px;font-size:13px;color:#ffd0a0}
+pre{background:rgba(0,0,0,0.3);border:1px solid rgba(255,220,180,0.1);border-radius:8px;padding:16px;overflow-x:auto;margin:12px 0}
+pre code{background:none;padding:0;color:#d0c5b8}
+table{width:100%;border-collapse:collapse;margin:12px 0}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,220,180,0.08)}
+th{color:#ffe0c0;font-weight:600}
+td{color:#d0c5b8}
+.tip{background:rgba(255,200,100,0.06);border-left:3px solid rgba(255,200,100,0.4);padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0}
+.warn{background:rgba(255,100,100,0.06);border-left:3px solid rgba(255,100,100,0.4);padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0}
+.money{background:rgba(100,200,100,0.06);border-left:3px solid rgba(100,200,100,0.4);padding:12px 16px;border-radius:0 8px 8px 0;margin:12px 0}
+.url-box{background:rgba(100,150,255,0.08);border:1px solid rgba(100,150,255,0.2);border-radius:8px;padding:12px 16px;margin:12px 0;text-align:center;font-size:15px;color:#a0c0ff;word-break:break-all}
+a{color:#a0c0ff;text-decoration:none}
+a:hover{text-decoration:underline}
+.timeline{display:flex;flex-direction:column;gap:0;margin:16px 0}
+.timeline-item{position:relative;padding-left:32px;padding-bottom:20px;border-left:2px solid rgba(255,220,180,0.15)}
+.timeline-item:last-child{border-left:2px solid transparent}
+.timeline-item::before{content:'';position:absolute;left:-7px;top:0;width:12px;height:12px;border-radius:50%;background:rgba(255,210,150,0.3);border:2px solid rgba(255,220,180,0.4)}
+.timeline-time{font-size:12px;color:rgba(255,220,180,0.4);margin-bottom:2px}
+.timeline-title{font-size:15px;color:#ffe0c0}
+.timeline-desc{font-size:13px;color:#d0c5b8;margin-top:2px}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>RingLight 上架 & 变现完整指南</h1>
+<p>从 PWA 到上架赚钱，一条龙走完。你的 App 地址：<code>https://drgonw1021-lgtm.github.io/ringlight/</code></p>
+
+<div class="url-box">https://drgonw1021-lgtm.github.io/ringlight/</div>
+
+<!-- ========== Part 1: 打包 ========== -->
+<h2>一、打包 Android 安装包</h2>
+
+<p>有两条路可以选：</p>
+
+<table>
+<tr><th>方案</th><th>工具</th><th>难度</th><th>需要安装</th><th>推荐</th></tr>
+<tr><td>PWABuilder 网页版</td><td>浏览器</td><td>⭐ 最简单</td><td>无需</td><td>✅ 首选</td></tr>
+<tr><td>Bubblewrap CLI</td><td>命令行</td><td>⭐⭐</td><td>JDK + Android SDK</td><td>进阶</td></tr>
+</table>
+
+<h3>方案 A：PWABuilder 网页版（推荐，5 分钟出包）</h3>
+
+<div class="step">
+<span class="step-num">1</span><b>打开 PWABuilder</b><br>
+<p>浏览器访问 <a href="https://www.pwabuilder.com" target="_blank">https://www.pwabuilder.com</a></p>
+</div>
+
+<div class="step">
+<span class="step-num">2</span><b>输入你的 App 地址</b><br>
+<p>在首页输入框中粘贴：</p>
+<pre><code>https://drgonw1021-lgtm.github.io/ringlight/</code></pre>
+<p>点击 <b>"Start"</b> 按钮</p>
+</div>
+
+<div class="step">
+<span class="step-num">3</span><b>等待分析完成</b><br>
+<p>PWABuilder 会自动检测你的 PWA 配置（manifest、service worker、图标等）。你的 App 已经配好了所有必要项，应该全绿通过。</p>
+</div>
+
+<div class="step">
+<span class="step-num">4</span><b>点击 "Package For Stores"</b><br>
+<p>分析完成后，点击页面上的 <b>"Package For Stores"</b> 按钮</p>
+</div>
+
+<div class="step">
+<span class="step-num">5</span><b>选择 Android</b><br>
+<p>在弹出的选项中选择 <b>"Android"</b> — 会进入 Android 打包配置页</p>
+</div>
+
+<div class="step">
+<span class="step-num">6</span><b>填写应用信息</b><br>
+<table>
+<tr><th>字段</th><th>填什么</th></tr>
+<tr><td>Package ID</td><td><code>com.ringlight.app</code>（或你喜欢的包名，格式 com.xxx.xxx）</td></tr>
+<tr><td>App name</td><td>RingLight 补光镜</td></tr>
+<tr><td>Short name</td><td>RingLight</td></tr>
+<tr><td>Launcher name</td><td>RingLight</td></tr>
+<tr><td>App version</td><td>1.0.0</td></tr>
+<tr><td>App version code</td><td>1</td></tr>
+<tr><td>Signing key</td><td>选 "New" — PWABuilder 会帮你生成签名密钥（<b>务必下载保存 .keystore 文件！</b>）</td></tr>
+</table>
+</div>
+
+<div class="step">
+<span class="step-num">7</span><b>下载 Android 包</b><br>
+<p>点击 <b>"Generate"</b>，等待 1~2 分钟，下载 <code>.zip</code> 文件。解压后里面有：</p>
+<ul style="margin-left:20px;color:#d0c5b8">
+<li><code>app-release-bundle.aab</code> — Google Play 上架用这个</li>
+<li><code>app-release-universal.apk</code> — 直接安装测试用这个</li>
+<li><code>keystore</code> 文件 — <b>一定要保存好！以后每次更新都要用</b></li>
+</ul>
+</div>
+
+<div class="warn">
+<b>⚠️ 签名密钥（keystore）丢了 = App 没法更新！</b><br>
+下载后立即备份到云盘、邮箱、U盘。如果丢了，只能换包名重新上架，老用户无法收到更新。
+</div>
+
+<!-- ========== Part 2: Google Play ========== -->
+<h2>二、上架 Google Play</h2>
+
+<h3>1. 注册 Google Play 开发者账号</h3>
+<div class="step">
+<p>① 访问 <a href="https://play.google.com/console" target="_blank">https://play.google.com/console</a></p>
+<p>② 用你的 Google 账号登录</p>
+<p>③ 支付 <b>$25 一次性注册费</b>（终身有效，不再收费）</p>
+<p>④ 填写开发者名称（会显示在商店里，比如 "RingLight Studio"）</p>
+<p>⑤ 邮箱验证 + 身份验证（1~2 天审核）</p>
+</div>
+
+<h3>2. 创建应用</h3>
+<div class="step">
+<p>① 进入 Play Console → 点击 <b>"Create app"</b></p>
+<p>② 填写：</p>
+<table>
+<tr><th>字段</th><th>内容</th></tr>
+<tr><td>App name</td><td>RingLight 补光镜</td></tr>
+<tr><td>Default language</td><td>简体中文</td></tr>
+<tr><td>App type</td><td>App（不是 Game）</td></tr>
+<tr><td>Pricing</td><td>Free（免费，后续靠广告+内购赚钱）</td></tr>
+</table>
+</div>
+
+<h3>3. 填写商店详情</h3>
+<div class="step">
+<p>需要准备以下材料：</p>
+<table>
+<tr><th>材料</th><th>要求</th><th>怎么做</th></tr>
+<tr><td>应用图标</td><td>512×512 PNG</td><td>已有：<code>icon-512.png</code></td></tr>
+<tr><td>主图（Feature Graphic）</td><td>1024×500 PNG</td><td>需制作（可以用 Canva）</td></tr>
+<tr><td>手机截图</td><td>至少 2 张，最多 8 张</td><td>手机截图你的 App 界面</td></tr>
+<tr><td>简短描述</td><td>≤80 字</td><td>"专业自拍补光灯 — 化妆镜级环形补光"</td></tr>
+<tr><td>完整描述</td><td>≤4000 字</td><td>写功能介绍、使用场景</td></tr>
+<tr><td>隐私政策</td><td>URL</td><td>需要一个隐私政策网页（可以用模板生成）</td></tr>
+</table>
+</div>
+
+<h3>4. 上传 AAB 包</h3>
+<div class="step">
+<p>① 左侧菜单 → <b>Production</b> → <b>Create release</b></p>
+<p>② 上传 <code>app-release-bundle.aab</code></p>
+<p>③ 填写发布说明（"首次发布 RingLight 补光镜"）</p>
+<p>④ 点击 <b>Review release</b> → <b>Start rollout to Production</b></p>
+</div>
+
+<h3>5. 等待审核</h3>
+<div class="step">
+<p>Google Play 审核通常 <b>1~7 天</b>。审核通过后，App 自动上线，用户可以搜索下载。</p>
+<p>审核被拒的常见原因：</p>
+<ul style="margin-left:20px;color:#d0c5b8">
+<li>隐私政策缺失（必须有）</li>
+<li>摄像头权限说明不充分（需要在描述里说明为什么需要摄像头）</li>
+<li>目标 API 级别过低（PWABuilder 生成的包一般没问题）</li>
+</ul>
+</div>
+
+<!-- ========== Part 3: 国内商店 ========== -->
+<h2>三、上架国内安卓商店（可选）</h2>
+
+<div class="warn">
+<b>国内上架需要软件著作权（软著）</b>，这是最大门槛。没有软著上不了国内商店。
+</div>
+
+<table>
+<tr><th>商店</th><th>注册费</th><th>需要软著</th><th>个人可注册</th></tr>
+<tr><td>华为应用市场</td><td>免费</td><td>是</td><td>❌ 需企业</td></tr>
+<tr><td>小米应用商店</td><td>免费</td><td>是</td><td>✅ 支持个人</td></tr>
+<tr><td>OPPO 开放平台</td><td>免费</td><td>是</td><td>✅ 支持个人</td></tr>
+<tr><td>vivo 开放平台</td><td>免费</td><td>是</td><td>✅ 支持个人</td></tr>
+<tr><td>应用宝（腾讯）</td><td>免费</td><td>是</td><td>✅ 支持个人</td></tr>
+</table>
+
+<h3>怎么办软著</h3>
+<div class="step">
+<p>① 在 <a href="https://register.ccopyright.com.cn" target="_blank">中国版权保护中心</a> 注册</p>
+<p>② 或者找代理办（淘宝搜"软著代办"），加急 3 天出证约 ¥800，普通 30 天约 ¥300</p>
+<p>③ 需要材料：源代码（前30页+后30页）、软件说明书、申请表</p>
+</div>
+
+<!-- ========== Part 4: 变现 ========== -->
+<h2>四、怎么赚钱 💰</h2>
+
+<h3>方案一：广告变现（最容易上手）</h3>
+<div class="money">
+<b>推荐广告位设计：</b>
+<table>
+<tr><th>广告位</th><th>触发时机</th><th>预估 CPM</th><th>用户体验</th></tr>
+<tr><td>开屏广告</td><td>App 启动时</td><td>¥15~30</td><td>可接受（3秒后关闭）</td></tr>
+<tr><td>插屏广告</td><td>拍照保存后</td><td>¥8~15</td><td>一般（建议每3次拍照才弹1次）</td></tr>
+<tr><td>激励视频</td><td>"看广告解锁高级滤镜"</td><td>¥20~40</td><td>用户主动看，不反感</td></tr>
+</table>
+</div>
+
+<p><b>接入方式（PWA/TWA 限制）：</b></p>
+<div class="warn">
+PWA/TWA 方式打包的 App 接入广告有限制——传统广告 SDK（穿山甲、优量汇）需要原生 Android 代码集成。两个解决方案：
+
+<p><b>方案 1：用 AdSense for Web</b> — 在网页里嵌入 AdSense 广告代码，TWA 会显示这些广告。收入略低但最简单。</p>
+<p><b>方案 2：转成 Capacitor 原生壳</b> — 用 Capacitor 替代 TWA 打包，可以集成原生广告 SDK。收入更高但需要更多开发工作。</p>
+</div>
+
+<h3>方案二：内购 / 订阅（收入天花板高）</h3>
+<div class="money">
+<p>面向年轻女性用户，设计免费+付费分层：</p>
+<table>
+<tr><th>功能</th><th>免费版</th><th>Pro 版（¥12/月 或 ¥68 买断）</th></tr>
+<tr><td>补光灯管</td><td>✅ 基础亮度</td><td>✅ 最高亮度 + 闪光灯增强</td></tr>
+<tr><td>色温调节</td><td>✅ 3 档预设</td><td>✅ 无级调节 + 自定义预设</td></tr>
+<tr><td>色环选色</td><td>❌</td><td>✅</td></tr>
+<tr><td>美颜滤镜</td><td>✅ 基础磨皮</td><td>✅ 全部参数 + 高级滤镜</td></tr>
+<tr><td>拍照</td><td>✅ 有水印</td><td>✅ 无水印 + 高清导出</td></tr>
+<tr><td>广告</td><td>有</td><td>无</td></tr>
+</table>
+
+<p><b>定价策略建议：</b></p>
+<ul style="margin-left:20px;color:#d0c5b8">
+<li>月订阅 ¥12 — 持续收入，适合重度用户</li>
+<li>季订阅 ¥30 — 折扣吸引，适合中间用户</li>
+<li>终身买断 ¥68 — 一次性收入，适合不喜欢订阅的用户</li>
+<li>新手优惠：首月 ¥6 试用，降低门槛</li>
+</ul>
+</div>
+
+<h3>方案三：混合变现（推荐）</h3>
+<div class="money">
+<pre><code>免费用户
+  ├─ 开屏广告 + 拍照后插屏广告 → 广告收入
+  ├─ "看广告解锁色环" → 激励视频收入
+  └─ 用着爽了 → 内购升级 Pro → 订阅/买断收入
+
+Pro 用户
+  └─ 无广告 + 全功能 → 纯订阅/买断收入</code></pre>
+
+<p><b>预估月收入（假设 1 万日活）：</b></p>
+<table>
+<tr><th>收入来源</th><th>预估月收入</th></tr>
+<tr><td>广告（1万 DAU × ¥3/千次展示 × 人均 5 次/天 × 30 天）</td><td>¥4,500</td></tr>
+<tr><td>内购转化（1万 DAU × 2% 转化 × ¥68 买断）</td><td>¥13,600（首月）</td></tr>
+<tr><td>订阅续费（稳定后 500 订阅用户 × ¥12/月）</td><td>¥6,000/月</td></tr>
+<tr><td><b>合计（稳定期月收入）</b></td><td><b>¥10,000~15,000/月</b></td></tr>
+</table>
+</div>
+
+<!-- ========== Part 5: 推广 ========== -->
+<h2>五、推广获取用户</h2>
+
+<table>
+<tr><th>渠道</th><th>成本</th><th>效果</th><th>怎么做</th></tr>
+<tr><td>小红书</td><td>免费</td><td>⭐⭐⭐⭐⭐</td><td>发自拍对比图（补光前 vs 补光后），带下载链接</td></tr>
+<tr><td>抖音</td><td>免费</td><td>⭐⭐⭐⭐⭐</td><td>拍"暗光自拍神器"短视频，展示效果</td></tr>
+<tr><td>微信朋友圈</td><td>免费</td><td>⭐⭐⭐</td><td>让朋友帮忙转发，口碑传播</td></tr>
+<tr><td>Google Play ASO</td><td>免费</td><td>⭐⭐⭐⭐</td><td>优化应用标题和描述关键词</td></tr>
+<tr><td>小红书 KOC 投放</td><td>¥500~2000/人</td><td>⭐⭐⭐⭐</td><td>找摄影/美妆博主试用推荐</td></tr>
+</table>
+
+<div class="tip">
+<b>💡 小红书是最佳渠道</b> — 目标用户（年轻女性）+ 自拍场景天然匹配。发"夜间自拍神器"类内容，带 App 下载链接，容易自然传播。
+</div>
+
+<!-- ========== Timeline ========== -->
+<h2>六、时间线总览</h2>
+
+<div class="timeline">
+<div class="timeline-item">
+<div class="timeline-time">第 1 天（今天）</div>
+<div class="timeline-title">PWABuilder 打包</div>
+<div class="timeline-desc">去 pwabuilder.com 输入地址，5 分钟生成 AAB + APK</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-time">第 1~2 天</div>
+<div class="timeline-title">注册 Google Play 开发者账号</div>
+<div class="timeline-desc">$25 注册费，1~2 天审核通过</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-time">第 2~3 天</div>
+<div class="timeline-title">准备商店素材</div>
+<div class="timeline-desc">截图、主图、描述、隐私政策</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-time">第 3~4 天</div>
+<div class="timeline-title">提交 Google Play 审核</div>
+<div class="timeline-desc">上传 AAB，填写信息，提交审核</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-time">第 4~10 天</div>
+<div class="timeline-title">审核通过，正式上线</div>
+<div class="timeline-desc">App 在 Google Play 可搜索下载</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-time">第 10~14 天</div>
+<div class="timeline-title">接入广告 + 内购</div>
+<div class="timeline-desc">AdSense 广告代码嵌入，内购功能开发</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-time">第 14 天起</div>
+<div class="timeline-title">推广获客</div>
+<div class="timeline-desc">小红书、抖音发内容，开始积累用户</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-time">第 30~45 天</div>
+<div class="timeline-title">国内商店（同步进行）</div>
+<div class="timeline-desc">办软著（30 天），审核上架小米/OPPO/vivo</div>
+</div>
+</div>
+
+<!-- ========== Quick Start ========== -->
+<h2>🚀 现在就做（3 步快速开始）</h2>
+
+<div class="step">
+<span class="step-num">1</span>
+<b>打开 PWABuilder</b><br>
+<p>👉 <a href="https://www.pwabuilder.com" target="_blank">点击打开 www.pwabuilder.com</a></p>
+</div>
+
+<div class="step">
+<span class="step-num">2</span>
+<b>输入地址并打包</b><br>
+<pre><code>https://drgonw1021-lgtm.github.io/ringlight/</code></pre>
+<p>点 Start → Package For Stores → Android → 填信息 → 下载</p>
+</div>
+
+<div class="step">
+<span class="step-num">3</span>
+<b>保存好 keystore 文件！</b><br>
+<p>下载的 zip 里有一个 <code>.keystore</code> 文件，这是你 App 的"身份证"，务必备份到多个地方。</p>
+</div>
+
+<div class="tip">
+<b>需要帮忙？</b> 拿到 AAB 文件后告诉我，我可以帮你写 Google Play 的应用描述、隐私政策页面、商店截图文案。
+</div>
+
+</div>
+</body>
+</html>
