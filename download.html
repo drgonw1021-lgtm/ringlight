@@ -78,6 +78,42 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
 }
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
 
+/* ===== Gallery ===== */
+.gallery{
+  padding:60px 20px 40px;max-width:600px;margin:0 auto;
+}
+.gallery-title{
+  font-size:24px;font-weight:600;color:#ffe0c0;text-align:center;
+  margin-bottom:8px;letter-spacing:1px;
+}
+.gallery-sub{
+  font-size:14px;color:rgba(255,220,180,0.4);text-align:center;margin-bottom:36px;
+}
+.gallery-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+}
+.gallery-item{
+  border-radius:18px;overflow:hidden;position:relative;
+  border:1px solid rgba(255,220,180,0.08);
+  transition:transform .2s;
+}
+.gallery-item:active{transform:scale(0.98)}
+.gallery-item.tall{grid-row:span 2}
+.gallery-item img{
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+.gallery-item .caption{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:20px 14px 12px;
+  background:linear-gradient(transparent,rgba(0,0,0,0.7));
+  font-size:12px;color:rgba(255,230,200,0.8);
+  text-align:center;letter-spacing:0.5px;
+}
+.gallery-item.full{
+  grid-column:span 2;
+}
+.gallery-item.full img{max-height:280px}
+
 /* ===== Features ===== */
 .features{
   padding:80px 20px;max-width:600px;margin:0 auto;
@@ -162,6 +198,10 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
 @media(max-width:480px){
   .hero h1{font-size:30px}
   .feature-grid{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:1fr}
+  .gallery-item.tall{grid-row:span 1}
+  .gallery-item.full{grid-column:span 1}
+  .gallery-item img{max-height:320px}
 }
 </style>
 </head>
@@ -192,6 +232,30 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
     </div>
   </div>
   <div class="scroll-hint">向下滚动了解功能 ↓</div>
+</section>
+
+<!-- ===== Gallery ===== -->
+<section class="gallery">
+  <h2 class="gallery-title">看见光的力量</h2>
+  <p class="gallery-sub">暗光自拍 · 化妆镜级补光 · 一键出片</p>
+  <div class="gallery-grid">
+    <div class="gallery-item tall">
+      <img src="promo-images/promo-selfie-night.png" alt="暗光自拍补光">
+      <div class="caption">暗光环境也能拍出通透感</div>
+    </div>
+    <div class="gallery-item">
+      <img src="promo-images/promo-product-shot.png" alt="灯管补光效果">
+      <div class="caption">边框灯管实时补光</div>
+    </div>
+    <div class="gallery-item">
+      <img src="promo-images/promo-flatlay.png" alt="化妆台场景">
+      <div class="caption">你的随身化妆镜</div>
+    </div>
+    <div class="gallery-item full">
+      <img src="promo-images/promo-vanity-selfie.png" alt="梳妆台自拍">
+      <div class="caption">暖光一开，氛围感拉满</div>
+    </div>
+  </div>
 </section>
 
 <!-- ===== Features ===== -->
