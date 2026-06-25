@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a1410">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RingLight">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>RingLight — 补光镜</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;
+  font-family:-apple-system,"SF Pro Display","PingFang SC",sans-serif;
+  user-select:none;-webkit-user-select:none}
+
+/* ===== Screen ===== */
+.screen{position:relative;width:100vw;height:100vh;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 45%,#1a1410,#0d0a08 70%,#060403);
+  touch-action:none}
+
+/* ===== Video (real camera) ===== */
+#video{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;z-index:0;
+  background:#0d0a08;
+  transform-origin:center center;
+  transition:filter 0.15s,transform 0.3s ease;
+}
+
+/* ===== Camera Status Overlay ===== */
+.cam-status{
+  position:absolute;inset:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(13,10,8,0.96);
+  transition:opacity 0.4s;
+}
+.cam-status.hide{opacity:0;pointer-events:none}
+.cam-status-text{
+  font-size:14px;color:rgba(255,220,180,0.5);
+  text-align:center;padding:0 40px;line-height:1.8;
+  animation:pulse 1.5s ease-in-out infinite;
+}
+.cam-status.error .cam-status-text{
+  color:rgba(255,180,160,0.7);animation:none;font-size:13px;
+}
+@keyframes pulse{
+  0%,100%{opacity:0.4}
+  50%{opacity:0.8}
+}
+
+/* ===== Light Bath (inner glow) ===== */
+.bath{position:absolute;inset:0;z-index:3;pointer-events:none;
+  mix-blend-mode:screen;opacity:0.75;transition:opacity 0.3s}
+.bath.off{opacity:0}
+
+/* ===== Light Tube Frame ===== */
+.tube-frame{position:absolute;inset:0;z-index:5;pointer-events:none}
+
+.tube{
+  position:absolute;
+  background:#1a1410;
+  border-radius:14px;
+}
+.tube-inner{
+  position:absolute;inset:3px;border-radius:11px;
+  background:#221814;
+  overflow:hidden;
+  transition:background 0.25s,box-shadow 0.25s;
+}
+.tube-glow{
+  position:absolute;inset:1px;border-radius:10px;
+  transition:background 0.25s,box-shadow 0.25s,opacity 0.25s;
+}
+
+/* Segment positions — top/sides 8px from edge, bottom above controls(120px)+8px gap=128px, 24px tube, corners cut 40px */
+.tube-top{top:8px;left:40px;right:40px;height:24px}
+.tube-top .tube-glow{box-shadow:0 6px 50px var(--glow),0 3px 20px var(--glow),0 0 80px var(--glow)}
+
+.tube-bottom{bottom:128px;left:40px;right:40px;height:24px}
+.tube-bottom .tube-glow{box-shadow:0 -6px 50px var(--glow),0 -3px 20px var(--glow),0 0 80px var(--glow)}
+
+.tube-left{top:40px;bottom:168px;left:8px;width:24px}
+.tube-left .tube-glow{box-shadow:6px 0 50px var(--glow),3px 0 20px var(--glow),0 0 80px var(--glow)}
+
+.tube-right{top:40px;bottom:168px;right:8px;width:24px}
+.tube-right .tube-glow{box-shadow:-6px 0 50px var(--glow),-3px 0 20px var(--glow),0 0 80px var(--glow)}
+
+/* Corner gap accent — small round glow at corners */
+.corner-glow{
+  position:absolute;width:10px;height:10px;border-radius:50%;
+  background:var(--glow,transparent);opacity:0;
+  filter:blur(6px);transition:opacity 0.25s;z-index:4;pointer-events:none;
+}
+.tube-frame:not(.off) .corner-glow{opacity:0.2}
+
+/* Off state */
+.tube-frame.off .tube-glow{opacity:0.08;background:#3a3028!important;box-shadow:none!important}
+.tube-frame.off .tube-inner{background:#181410}
+
+/* LED dot pattern inside tube */
+.tube-dots{
+  position:absolute;inset:0;border-radius:10px;
+  background-image:radial-gradient(circle,rgba(255,255,255,0.18) 1px,transparent 1.5px);
+  background-size:8px 100%;
+  background-repeat:repeat-x;
+  opacity:0;transition:opacity 0.25s;
+  pointer-events:none;
+}
+.tube-left .tube-dots,.tube-right .tube-dots{
+  background-size:100% 8px;background-repeat:repeat-y;
+}
+.tube-frame:not(.off) .tube-dots{opacity:0.3}
+
+/* ===== Top Bar ===== */
+.top-bar{
+  position:absolute;top:26px;left:0;right:0;z-index:40;
+  display:flex;justify-content:center;align-items:center;
+  gap:6px;pointer-events:none;
+}
+.brand{
+  font-size:12px;font-weight:200;letter-spacing:5px;
+  color:rgba(255,235,210,0.2);text-transform:uppercase;
+}
+
+/* ===== Value Pills ===== */
+.vals{
+  position:absolute;top:58px;left:50%;transform:translateX(-50%);
+  display:flex;gap:6px;z-index:40;opacity:0;
+  transition:opacity 0.3s;pointer-events:none;
+}
+.vals.show{opacity:1}
+.val{
+  padding:5px 14px;border-radius:18px;
+  background:rgba(18,14,12,0.75);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,220,180,0.07);
+  font-size:10.5px;color:rgba(255,220,180,0.3);
+  display:flex;align-items:center;gap:4px;
+  font-weight:400;letter-spacing:0.3px;
+}
+.val b{color:rgba(255,230,200,0.85);font-weight:500;font-size:11px}
+
+/* ===== Color Wheel ===== */
+.color-wheel{
+  position:fixed;width:140px;height:140px;border-radius:50%;
+  background:conic-gradient(from 90deg,
+    hsl(0,75%,55%),hsl(30,80%,55%),hsl(45,85%,55%),
+    hsl(60,80%,55%),hsl(90,65%,50%),hsl(120,60%,45%),
+    hsl(150,60%,45%),hsl(180,65%,50%),hsl(200,75%,55%),
+    hsl(220,80%,58%),hsl(250,70%,60%),hsl(280,65%,55%),
+    hsl(310,70%,55%),hsl(340,75%,55%),hsl(360,75%,55%));
+  opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:56;
+  mask:radial-gradient(circle,transparent 34px,#000 36px,#000 68px,transparent 70px);
+  -webkit-mask:radial-gradient(circle,transparent 34px,#000 36px,#000 68px,transparent 70px);
+}
+.color-wheel.show{opacity:0.95}
+.color-dot{
+  position:fixed;width:18px;height:18px;border-radius:50%;
+  border:2.5px solid rgba(255,255,255,0.9);
+  box-shadow:0 0 8px rgba(0,0,0,0.5),0 0 4px rgba(255,255,255,0.3);
+  opacity:0;transition:opacity 0.2s;pointer-events:none;z-index:57;
+  transform:translate(-50%,-50%);
+}
+.color-dot.show{opacity:1}
+.color-reset{
+  position:fixed;width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,0.08);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:rgba(255,255,255,0.5);z-index:58;
+  opacity:0;transition:opacity 0.2s;pointer-events:none;
+  touch-action:none;cursor:pointer;transform:translate(-50%,-50%);
+}
+.color-reset.show{opacity:1;pointer-events:auto}
+
+/* ===== Beauty Panel ===== */
+.beauty-panel{
+  position:absolute;left:50%;bottom:165px;transform:translateX(-50%) translateY(8px) scale(0.96);
+  width:252px;padding:16px 20px 14px;
+  border-radius:22px;
+  background:rgba(18,14,12,0.85);backdrop-filter:blur(28px) saturate(1.3);
+  border:1px solid rgba(255,220,180,0.1);
+  z-index:55;opacity:0;
+  transition:all 0.3s cubic-bezier(0.22,0.61,0.36,1);
+  pointer-events:none;
+  box-shadow:0 16px 48px rgba(0,0,0,0.5),0 0 0 0.5px rgba(255,220,180,0.03);
+}
+.beauty-panel.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1);pointer-events:auto}
+.bp-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.bp-title{font-size:14px;font-weight:500;color:rgba(255,230,200,0.7);letter-spacing:1px}
+.bp-close{
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(255,255,255,0.06);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;border:none;
+  color:rgba(255,255,255,0.35);
+}
+.bp-close:active{transform:scale(0.85)}
+.bp-row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.bp-row:last-child{margin-bottom:0}
+.bp-label{
+  font-size:12px;color:rgba(255,220,180,0.45);width:30px;flex-shrink:0;
+  font-weight:400;
+}
+.bp-track{
+  flex:1;height:32px;display:flex;align-items:center;position:relative;
+}
+.bp-range{
+  width:100%;height:3px;-webkit-appearance:none;appearance:none;
+  background:rgba(255,255,255,0.08);border-radius:2px;outline:none;
+  cursor:pointer;
+}
+.bp-range::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:16px;height:16px;border-radius:50%;
+  background:linear-gradient(135deg,#fff,#f0d8c0);
+  box-shadow:0 0 8px rgba(255,220,180,0.3),0 1px 3px rgba(0,0,0,0.2);
+  cursor:pointer;
+}
+.bp-range::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,#fff,#f0d8c0);
+  box-shadow:0 0 8px rgba(255,220,180,0.3);cursor:pointer;
+}
+.bp-val{
+  font-size:11px;color:rgba(255,220,180,0.3);width:24px;text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ===== Bottom Controls ===== */
+.controls{
+  position:absolute;bottom:0;left:0;right:0;height:120px;z-index:50;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.btn{
+  position:absolute;pointer-events:auto;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all 0.18s ease;
+  touch-action:manipulation;border:none;
+  color:rgba(255,230,200,0.55);
+}
+.btn svg{display:block;pointer-events:none}
+.btn:active{transform:scale(0.88)}
+
+/* Light button */
+.btn-light{
+  bottom:38px;left:26px;
+  width:46px;height:46px;border-radius:15px;
+  background:rgba(22,18,14,0.72);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,220,180,0.09);
+  touch-action:none;
+}
+.btn-light.on{
+  background:rgba(255,205,145,0.14);
+  border-color:rgba(255,210,150,0.32);
+  box-shadow:0 0 18px rgba(255,210,150,0.18),inset 0 0 10px rgba(255,210,150,0.1);
+  color:rgba(255,225,180,0.95);
+}
+
+/* Beauty button */
+.btn-beauty{
+  bottom:38px;left:84px;
+  width:46px;height:46px;border-radius:15px;
+  background:rgba(22,18,14,0.72);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,220,180,0.09);
+}
+.btn-beauty.on{
+  background:rgba(255,180,200,0.12);
+  border-color:rgba(255,180,200,0.32);
+  color:rgba(255,200,215,0.95);
+}
+
+/* Shutter button */
+.btn-shutter{
+  bottom:30px;left:50%;transform:translateX(-50%);
+  width:66px;height:66px;border-radius:50%;
+  background:transparent;
+  border:2.5px solid rgba(255,230,200,0.32);
+}
+.btn-shutter:active{transform:translateX(-50%) scale(0.9)}
+.btn-shutter::after{
+  content:'';position:absolute;inset:4px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(255,235,210,0.18),rgba(255,220,180,0.06));
+  border:1px solid rgba(255,230,200,0.18);
+  transition:all 0.15s;
+}
+.btn-shutter:active::after{
+  background:rgba(255,235,210,0.35);
+}
+
+/* Flip button */
+.btn-flip{
+  bottom:38px;right:26px;
+  width:46px;height:46px;border-radius:15px;
+  background:rgba(22,18,14,0.72);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,220,180,0.09);
+}
+
+/* Thumbnail */
+.thumb{
+  position:absolute;bottom:40px;right:84px;
+  width:38px;height:38px;border-radius:11px;
+  border:1px solid rgba(255,220,180,0.12);
+  z-index:50;overflow:hidden;display:none;
+  pointer-events:none;
+}
+
+/* ===== Flash ===== */
+.flash{position:absolute;inset:0;background:#fff;z-index:999;
+  opacity:0;pointer-events:none}
+
+/* ===== Hint ===== */
+.hint{
+  position:absolute;bottom:180px;left:50%;transform:translateX(-50%);
+  z-index:40;opacity:0;transition:opacity 0.5s;
+  pointer-events:none;white-space:nowrap;text-align:center;
+}
+.hint.show{opacity:1}
+.hint div{
+  font-size:11px;color:rgba(255,220,180,0.22);margin:3px 0;
+  font-weight:300;letter-spacing:0.8px;
+}
+.hint b{color:rgba(255,230,200,0.45);font-weight:400}
+
+/* ===== Boost Overlay — extra white border at high brightness ===== */
+.boost-overlay{
+  position:absolute;inset:0;z-index:4;pointer-events:none;
+  opacity:0;transition:opacity 0.3s;
+}
+.boost-overlay.on{opacity:1}
+.boost-overlay::before{
+  content:'';position:absolute;inset:0;
+  border:24px solid #fff;
+  border-radius:0;
+  box-shadow:inset 0 0 60px rgba(255,255,255,0.3);
+  mask:
+    linear-gradient(0deg,transparent 40px,#000 42px,#000 calc(100% - 170px),transparent calc(100% - 168px)),
+    linear-gradient(90deg,transparent 40px,#000 42px,#000 calc(100% - 42px),transparent calc(100% - 40px));
+  -webkit-mask:
+    linear-gradient(0deg,transparent 40px,#000 42px,#000 calc(100% - 170px),transparent calc(100% - 168px)),
+    linear-gradient(90deg,transparent 40px,#000 42px,#000 calc(100% - 42px),transparent calc(100% - 40px));
+  -webkit-mask-composite:source-in;
+  mask-composite:intersect;
+}
+
+/* ===== Brightness Tip ===== */
+.brightness-tip{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:80;background:rgba(18,14,12,0.92);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,220,180,0.12);border-radius:20px;
+  padding:24px 28px;text-align:center;max-width:300px;
+  opacity:0;transition:opacity 0.4s,transform 0.4s;pointer-events:none;
+}
+.brightness-tip.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.brightness-tip h3{
+  font-size:15px;font-weight:500;color:rgba(255,230,200,0.85);
+  margin-bottom:10px;letter-spacing:0.5px;
+}
+.brightness-tip p{
+  font-size:12.5px;color:rgba(255,220,180,0.4);line-height:1.7;
+}
+.brightness-tip button{
+  margin-top:16px;padding:10px 28px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,rgba(255,220,180,0.15),rgba(255,200,160,0.08));
+  border:1px solid rgba(255,220,180,0.15);
+  color:rgba(255,230,200,0.7);font-size:13px;font-weight:500;
+  cursor:pointer;transition:all 0.2s;
+}
+.brightness-tip button:active{transform:scale(0.95)}
+.adjust-ring{
+  position:absolute;inset:0;z-index:6;pointer-events:none;
+  opacity:0;transition:opacity 0.3s;
+}
+.adjust-ring.show{opacity:1}
+.adjust-ring::before{
+  content:'';position:absolute;inset:2px;
+  border:1.5px solid rgba(255,210,150,0.15);
+  border-radius:8px;
+}
+</style>
+</head>
+<body>
+
+<div class="screen" id="screen">
+  <video id="video" autoplay playsinline muted></video>
+  <div class="cam-status" id="camStatus">
+    <div class="cam-status-text" id="camStatusText">正在请求摄像头权限...</div>
+  </div>
+  <div class="bath" id="bath"></div>
+  <div class="tube-frame" id="tubeFrame">
+    <div class="tube tube-top"><div class="tube-inner"><div class="tube-glow"></div><div class="tube-dots"></div></div></div>
+    <div class="tube tube-bottom"><div class="tube-inner"><div class="tube-glow"></div><div class="tube-dots"></div></div></div>
+    <div class="tube tube-left"><div class="tube-inner"><div class="tube-glow"></div><div class="tube-dots"></div></div></div>
+    <div class="tube tube-right"><div class="tube-inner"><div class="tube-glow"></div><div class="tube-dots"></div></div></div>
+    <div class="corner-glow" style="top:8px;left:8px"></div>
+    <div class="corner-glow" style="top:8px;right:8px"></div>
+    <div class="corner-glow" style="bottom:128px;left:8px"></div>
+    <div class="corner-glow" style="bottom:128px;right:8px"></div>
+  </div>
+  <div class="adjust-ring" id="adjustRing"></div>
+  <div class="boost-overlay" id="boostOverlay"></div>
+  <div class="brightness-tip" id="brightnessTip">
+    <h3>💡 亮度优化建议</h3>
+    <p>将手机<strong style="color:rgba(255,230,200,0.7)">屏幕亮度调到最大</strong>，补光效果可提升 50% 以上。屏幕亮度是补光灯的物理上限。</p>
+    <button id="tipClose">知道了</button>
+  </div>
+  <div class="top-bar"><div class="brand">RingLight</div></div>
+  <div class="vals" id="vals">
+    <div class="val">亮度 <b id="vB">70</b></div>
+    <div class="val">色温 <b id="vT">暖光</b></div>
+    <div class="val">色彩 <b id="vH">暖白</b></div>
+  </div>
+  <div class="color-wheel" id="colorWheel"></div>
+  <div class="color-dot" id="colorDot"></div>
+  <div class="color-reset" id="colorReset">白</div>
+  <div class="beauty-panel" id="beautyPanel">
+    <div class="bp-header">
+      <div class="bp-title">美颜</div>
+      <button class="bp-close" id="bpClose">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg>
+      </button>
+    </div>
+    <div class="bp-row"><span class="bp-label">磨皮</span><div class="bp-track"><input type="range" min="0" max="100" value="0" class="bp-range" data-key="smooth"></div><span class="bp-val" data-val="smooth">0</span></div>
+    <div class="bp-row"><span class="bp-label">美白</span><div class="bp-track"><input type="range" min="0" max="100" value="0" class="bp-range" data-key="white"></div><span class="bp-val" data-val="white">0</span></div>
+    <div class="bp-row"><span class="bp-label">瘦脸</span><div class="bp-track"><input type="range" min="0" max="100" value="0" class="bp-range" data-key="slim"></div><span class="bp-val" data-val="slim">0</span></div>
+    <div class="bp-row"><span class="bp-label">大眼</span><div class="bp-track"><input type="range" min="0" max="100" value="0" class="bp-range" data-key="eye"></div><span class="bp-val" data-val="eye">0</span></div>
+  </div>
+  <div class="hint" id="hint">
+    <div><b>灯键拖动</b>选色 &nbsp; <b>上下滑</b>亮度 &nbsp; <b>左右滑</b>色温</div>
+    <div><b>星光</b>美颜 &nbsp; <b>快门</b>拍照 &nbsp; <b>翻转</b>切换摄像头</div>
+  </div>
+  <div class="controls">
+    <button class="btn btn-light on" id="btnLight">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18h6"/><path d="M10 21.5h4"/>
+        <path d="M12 2a7 7 0 0 0-4.5 12.3c.5.4.8 1 .9 1.7h7.2c.1-.7.4-1.3.9-1.7A7 7 0 0 0 12 2z"/>
+      </svg>
+    </button>
+    <button class="btn btn-beauty" id="btnBeauty">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2.5l2.2 6.3 6.3 2.2-6.3 2.2-2.2 6.3-2.2-6.3L3.5 11l6.3-2.2z"/>
+        <path d="M18.5 3.5v3M20 5h-3M5.5 16.5v2.5M6.75 17.75h-2.5"/>
+      </svg>
+    </button>
+    <button class="btn btn-shutter" id="btnShutter"></button>
+    <button class="btn btn-flip" id="btnFlip">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.5 9a8.5 8.5 0 0 1 13.5-3.5L20 8"/>
+        <path d="M20 4.5V8h-3.5"/>
+        <path d="M20.5 15a8.5 8.5 0 0 1-13.5 3.5L4 16"/>
+        <path d="M4 19.5V16h3.5"/>
+      </svg>
+    </button>
+  </div>
+  <div class="thumb" id="thumb"></div>
+  <div class="flash" id="flash"></div>
+</div>
+
+<script>
+// ===== State — brightness range 5~150, temp range -180~100 =====
+var S = {
+  power: true,
+  brightness: 70,
+  temp: -35,
+  hue: -1,
+  sat: 0,
+  beauty: { smooth: 0, white: 0, slim: 0, eye: 0 },
+  beautyOpen: false,
+  lightStart: null,
+  lightDragging: false,
+  screenStart: null,
+  screenDragging: false,
+  sB: 70, sT: -35
+};
+var BMAX = 150; // max brightness
+
+// ===== Camera State =====
+var currentStream = null;
+var currentFacingMode = 'user';
+
+// ===== Camera Functions =====
+function showCameraStatus(text) {
+  var el = document.getElementById('camStatus');
+  el.classList.remove('hide');
+  el.classList.remove('error');
+  document.getElementById('camStatusText').innerHTML = text;
+}
+
+function hideCameraStatus() {
+  document.getElementById('camStatus').classList.add('hide');
+}
+
+function showCameraError(msg) {
+  var el = document.getElementById('camStatus');
+  el.classList.remove('hide');
+  el.classList.add('error');
+  document.getElementById('camStatusText').innerHTML = msg;
+}
+
+function startCamera(facingMode) {
+  // HTTPS check
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    showCameraError('需要 HTTPS 环境才能使用摄像头<br>请通过 https:// 访问');
+    return;
+  }
+
+  // API check
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showCameraError('当前浏览器不支持摄像头访问<br>请使用 Chrome 或 Safari');
+    return;
+  }
+
+  showCameraStatus(facingMode === 'user' ? '正在请求摄像头权限...' : '正在切换摄像头...');
+
+  // Stop current stream
+  if (currentStream) {
+    currentStream.getTracks().forEach(function(t) { t.stop(); });
+    currentStream = null;
+  }
+
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: facingMode },
+    audio: false
+  }).then(function(stream) {
+    currentStream = stream;
+    currentFacingMode = facingMode;
+    var video = document.getElementById('video');
+    video.srcObject = stream;
+    video.onloadedmetadata = function() {
+      video.play().then(function() {
+        hideCameraStatus();
+        updateBeauty(); // Apply mirror + beauty to real video
+      }).catch(function() {
+        hideCameraStatus();
+        updateBeauty();
+      });
+    };
+  }).catch(function(err) {
+    var msg = '无法访问摄像头，请检查权限设置';
+    if (err.name === 'NotAllowedError') {
+      msg = '摄像头权限被拒绝<br>请在浏览器设置中允许访问摄像头';
+    } else if (err.name === 'NotFoundError') {
+      msg = '未找到摄像头设备';
+    } else if (err.name === 'NotReadableError') {
+      msg = '摄像头被其他应用占用<br>请关闭后重试';
+    } else if (err.name === 'OverconstrainedError') {
+      // Try default camera if facingMode not available
+      msg = '无法切换到该摄像头<br>可能设备不支持';
+    }
+    showCameraError(msg);
+  });
+}
+
+// ===== Color Utils =====
+function tempRGB(t) {
+  // Warm side: t < 0, range -180~0, map to n = t/180 → 0~-1
+  // Cold side: t > 0, range 0~100, map to n = t/100 → 0~1
+  if (t < 0) {
+    var w = t / 180; // 0 to -1
+    return { r: 255, g: Math.round(255 + w * 100), b: Math.round(255 + w * 210) };
+  }
+  var n = t / 100;
+  return { r: Math.round(255 - n * 35), g: Math.round(255 - n * 12), b: 255 };
+}
+function hsl2rgb(h, s, l) {
+  s /= 100; l /= 100;
+  var k = function(n) { return (n + h / 30) % 12; };
+  var a = s * Math.min(l, 1 - l);
+  var f = function(n) { return l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)); };
+  return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+}
+function getRGB() {
+  if (S.hue < 0 || S.sat < 3) return tempRGB(S.temp);
+  var rgb = hsl2rgb(S.hue, Math.min(55, S.sat), 60);
+  return { r: rgb[0], g: rgb[1], b: rgb[2] };
+}
+
+// ===== Update Visuals =====
+function updateTubes() {
+  var frame = document.getElementById('tubeFrame');
+  var glows = document.querySelectorAll('.tube-glow');
+  var boost = document.getElementById('boostOverlay');
+  var c = getRGB();
+  var b = S.brightness / 100; // can go up to 1.5
+
+  if (S.power) {
+    frame.classList.remove('off');
+    var r = c.r, g = c.g, bl = c.b;
+    
+    // At high brightness (>100%), blend color toward pure white for max light output
+    if (b > 1) {
+      var blend = (b - 1) * 0.6; // 0 at b=1, 0.3 at b=1.5
+      r = Math.round(r + (255 - r) * blend);
+      g = Math.round(g + (255 - g) * blend);
+      bl = Math.round(bl + (255 - bl) * blend);
+    }
+    
+    // Alpha scales with brightness, clamped to 1
+    var glowAlpha = Math.min(1, 0.5 + b * 0.45);
+    var glowColor = 'rgba(' + r + ',' + g + ',' + bl + ',' + glowAlpha + ')';
+    var innerAlpha1 = Math.min(1, 0.85 + b * 0.15);
+    var innerAlpha2 = Math.min(1, 0.7 + b * 0.3);
+    var innerColor = 'linear-gradient(135deg,' +
+      'rgba(' + Math.min(255, r + 30) + ',' + Math.min(255, g + 25) + ',' + Math.min(255, bl + 20) + ',' + innerAlpha1 + '),' +
+      'rgba(' + r + ',' + g + ',' + bl + ',' + innerAlpha2 + '))';
+
+    document.documentElement.style.setProperty('--glow', glowColor);
+
+    glows.forEach(function(el) {
+      el.style.background = innerColor;
+      el.style.opacity = Math.min(1, 0.8 + b * 0.2);
+      // Extra dynamic brightness for high brightness
+      var brightFilter = b > 1 ? 'brightness(' + (1 + (b - 1) * 1.0) + ')' : '';
+      el.style.filter = brightFilter;
+    });
+    
+    // Boost overlay: activate at brightness > 80% for extra white border light
+    if (b > 0.8) {
+      boost.classList.add('on');
+      var boostAlpha = Math.min(0.9, (b - 0.8) * 1.5);
+      boost.style.opacity = boostAlpha;
+    } else {
+      boost.classList.remove('on');
+      boost.style.opacity = '';
+    }
+  } else {
+    frame.classList.add('off');
+    boost.classList.remove('on');
+    boost.style.opacity = '';
+  }
+}
+
+function updateBath() {
+  var bath = document.getElementById('bath');
+  var btn = document.getElementById('btnLight');
+  if (S.power) {
+    var c = getRGB(), b = S.brightness / 100;
+    bath.classList.remove('off');
+    // Bath intensity scales harder — at high brightness, much more light floods the screen
+    var bathA = Math.min(0.72, b * 0.32);
+    var bathB = Math.min(0.5, b * 0.22);
+    bath.style.background =
+      'radial-gradient(ellipse 80% 50% at 50% 0%,rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + bathA + ') 0%,transparent 60%),' +
+      'radial-gradient(ellipse 80% 40% at 50% 86%,rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (bathA * 0.7) + ') 0%,transparent 50%),' +
+      'radial-gradient(ellipse 50% 70% at 0% 50%,rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + bathB + ') 0%,transparent 40%),' +
+      'radial-gradient(ellipse 50% 70% at 100% 50%,rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + bathB + ') 0%,transparent 40%)';
+    btn.classList.add('on');
+  } else {
+    bath.classList.add('off');
+    btn.classList.remove('on');
+  }
+}
+
+function updateBeauty() {
+  var video = document.getElementById('video');
+  if (!video) return;
+  var s = S.beauty.smooth / 100;
+  var w = S.beauty.white / 100;
+  var sl = S.beauty.slim / 100;
+  var eye = S.beauty.eye / 100;
+
+  // Filter: blur for smoothing, brightness+saturate for whitening
+  video.style.filter = 'blur(' + (s * 2.5) + 'px) brightness(' + (1 + w * 0.25) + ') saturate(' + (1 - w * 0.1) + ')';
+
+  // Transform: mirror for front cam + slim (scaleX) + eye zoom (scale)
+  var transform = '';
+  if (currentFacingMode === 'user') {
+    transform = 'scaleX(-1) ';
+  }
+  transform += 'scaleX(' + (1 - sl * 0.08) + ') scale(' + (1 + eye * 0.05) + ')';
+  video.style.transform = transform;
+}
+
+function updateVals() {
+  document.getElementById('vB').textContent = Math.round(S.brightness);
+  var tl = '中性';
+  if (S.temp < -100) tl = '超暖'; else if (S.temp < -50) tl = '暖光'; else if (S.temp < -15) tl = '微暖';
+  else if (S.temp > 30) tl = '冷光'; else if (S.temp > 10) tl = '微冷';
+  document.getElementById('vT').textContent = tl;
+  var hl = '暖白';
+  if (S.hue >= 0 && S.sat > 3) {
+    var ns = [[15,'暖红'],[30,'橙'],[45,'暖黄'],[60,'黄'],[90,'黄绿'],[120,'绿'],[150,'青绿'],[180,'青'],[210,'天蓝'],[240,'蓝'],[270,'紫'],[300,'品红'],[330,'玫红'],[360,'暖红']];
+    for (var i = 0; i < ns.length; i++) { if (S.hue <= ns[i][0]) { hl = ns[i][1]; break; } }
+  }
+  document.getElementById('vH').textContent = hl;
+}
+
+function update() { updateTubes(); updateBath(); updateVals(); }
+
+// ===== Color Wheel =====
+var wheelHideTimer = null;
+
+function showColorWheel() {
+  var btn = document.getElementById('btnLight');
+  var rect = btn.getBoundingClientRect();
+  var cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+  var wheel = document.getElementById('colorWheel');
+  var dot = document.getElementById('colorDot');
+  var reset = document.getElementById('colorReset');
+  wheel.style.left = (cx - 70) + 'px';
+  wheel.style.top = (cy - 70) + 'px';
+  wheel.classList.add('show');
+  reset.style.left = cx + 'px';
+  reset.style.top = cy + 'px';
+  reset.classList.add('show');
+  updateColorDot();
+  dot.classList.add('show');
+}
+
+function hideColorWheel() {
+  document.getElementById('colorWheel').classList.remove('show');
+  document.getElementById('colorDot').classList.remove('show');
+  document.getElementById('colorReset').classList.remove('show');
+}
+
+function updateColorDot() {
+  var btn = document.getElementById('btnLight');
+  var rect = btn.getBoundingClientRect();
+  var cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+  var dot = document.getElementById('colorDot');
+  if (S.hue >= 0) {
+    var rad = S.hue * Math.PI / 180;
+    dot.style.left = (cx + 52 * Math.cos(rad)) + 'px';
+    dot.style.top = (cy + 52 * Math.sin(rad)) + 'px';
+    var rgb = getRGB();
+    dot.style.background = 'rgb(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ')';
+  }
+}
+
+// ===== Light Button: tap=on/off, drag=color =====
+var btnLight = document.getElementById('btnLight');
+
+btnLight.addEventListener('pointerdown', function(e) {
+  S.lightStart = { x: e.clientX, y: e.clientY };
+  S.lightDragging = false;
+});
+
+document.getElementById('colorReset').addEventListener('pointerdown', function(e) {
+  e.stopPropagation();
+  S.hue = -1; S.sat = 0;
+  update();
+  hideColorWheel();
+  clearTimeout(wheelHideTimer);
+});
+
+// ===== Global pointer handlers =====
+function handlePointerMove(e) {
+  if (S.lightStart) {
+    var dx = e.clientX - S.lightStart.x;
+    var dy = e.clientY - S.lightStart.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    if (!S.lightDragging && dist > 8) {
+      S.lightDragging = true;
+      showColorWheel();
+    }
+    if (S.lightDragging) {
+      var btn = document.getElementById('btnLight');
+      var rect = btn.getBoundingClientRect();
+      var cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+      var angle = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI;
+      if (angle < 0) angle += 360;
+      S.hue = angle; S.sat = 55;
+      update();
+      updateColorDot();
+      showVals();
+    }
+    return;
+  }
+  if (S.screenStart && !S.lightDragging) {
+    var dx2 = e.clientX - S.screenStart.x;
+    var dy2 = e.clientY - S.screenStart.y;
+    if (!S.screenDragging && (Math.abs(dx2) > 5 || Math.abs(dy2) > 5)) {
+      S.screenDragging = true;
+    }
+    if (S.screenDragging) {
+      // Brightness up to BMAX(150), temp -180~100
+      S.brightness = Math.max(5, Math.min(BMAX, S.sB - dy2 * 0.6));
+      S.temp = Math.max(-180, Math.min(100, S.sT + dx2 * 0.4));
+      update();
+      showVals();
+    }
+  }
+}
+
+function handlePointerEnd() {
+  if (S.lightStart) {
+    if (!S.lightDragging) {
+      S.power = !S.power;
+      update();
+      if (S.power) { showVals(); hideValsDelayed(); }
+    } else {
+      clearTimeout(wheelHideTimer);
+      wheelHideTimer = setTimeout(hideColorWheel, 3000);
+      hideValsDelayed();
+    }
+    S.lightStart = null;
+    S.lightDragging = false;
+  }
+  if (S.screenStart) {
+    S.screenStart = null;
+    S.screenDragging = false;
+    hideValsDelayed();
+  }
+}
+
+window.addEventListener('pointermove', handlePointerMove);
+window.addEventListener('pointerup', handlePointerEnd);
+window.addEventListener('pointercancel', handlePointerEnd);
+
+// ===== Screen drag =====
+var screen = document.getElementById('screen');
+screen.addEventListener('pointerdown', function(e) {
+  if (e.target.closest('.btn') || e.target.closest('.beauty-panel') ||
+      e.target.closest('.color-reset') || e.target.closest('.color-wheel') ||
+      e.target.closest('.bp-close')) return;
+  if (!S.power) return;
+  S.screenStart = { x: e.clientX, y: e.clientY };
+  S.sB = S.brightness; S.sT = S.temp;
+  S.screenDragging = false;
+});
+
+// ===== Beauty Panel =====
+var btnBeauty = document.getElementById('btnBeauty');
+var beautyPanel = document.getElementById('beautyPanel');
+
+btnBeauty.addEventListener('click', function() {
+  S.beautyOpen = !S.beautyOpen;
+  beautyPanel.classList.toggle('show', S.beautyOpen);
+  btnBeauty.classList.toggle('on', S.beautyOpen);
+});
+
+document.getElementById('bpClose').addEventListener('click', function() {
+  S.beautyOpen = false;
+  beautyPanel.classList.remove('show');
+  btnBeauty.classList.remove('on');
+});
+
+document.querySelectorAll('.bp-range').forEach(function(slider) {
+  slider.addEventListener('input', function() {
+    var key = this.dataset.key;
+    var val = parseInt(this.value);
+    S.beauty[key] = val;
+    document.querySelector('[data-val="' + key + '"]').textContent = val;
+    updateBeauty();
+  });
+});
+
+// ===== Shutter — Real Photo Capture =====
+document.getElementById('btnShutter').addEventListener('click', function() {
+  var video = document.getElementById('video');
+  if (!video || !video.videoWidth || !currentStream) return;
+
+  // Flash animation
+  var fl = document.getElementById('flash');
+  fl.style.transition = 'opacity 0.05s';
+  fl.style.opacity = '0.85';
+  setTimeout(function() {
+    fl.style.transition = 'opacity 0.4s';
+    fl.style.opacity = '0';
+  }, 80);
+
+  // Create canvas at native video resolution
+  var canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  var ctx = canvas.getContext('2d');
+
+  // Apply beauty filter to canvas draw
+  var s = S.beauty.smooth / 100;
+  var w = S.beauty.white / 100;
+  ctx.filter = 'blur(' + (s * 2.5) + 'px) brightness(' + (1 + w * 0.25) + ') saturate(' + (1 - w * 0.1) + ')';
+
+  // Draw video frame — flip horizontally for front camera
+  if (currentFacingMode === 'user') {
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+    ctx.restore();
+  } else {
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  }
+
+  // Reset filter for overlay
+  ctx.filter = 'none';
+
+  // Light overlay — only if light is on
+  if (S.power) {
+    var c = getRGB();
+    var b = S.brightness / 100;
+    ctx.globalCompositeOperation = 'screen';
+    var cx = canvas.width / 2;
+    var cy = canvas.height * 0.4;
+    var radius = Math.max(canvas.width, canvas.height) * 0.6;
+    var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+    var alpha = Math.min(0.35, b * 0.18);
+    grad.addColorStop(0, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + alpha + ')');
+    grad.addColorStop(0.5, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (alpha * 0.3) + ')');
+    grad.addColorStop(1, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // Convert to blob and download
+  canvas.toBlob(function(blob) {
+    if (!blob) return;
+    var url = URL.createObjectURL(blob);
+    // Trigger download
+    var a = document.createElement('a');
+    a.download = 'ringlight_' + Date.now() + '.jpg';
+    a.href = url;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function() { URL.revokeObjectURL(url); }, 3000);
+
+    // Show thumbnail with captured photo
+    var thumbUrl = URL.createObjectURL(blob);
+    var th = document.getElementById('thumb');
+    th.style.background = 'url(' + thumbUrl + ') center/cover';
+    th.style.display = 'block';
+  }, 'image/jpeg', 0.92);
+});
+
+// ===== Flip — Real Camera Switch =====
+document.getElementById('btnFlip').addEventListener('click', function() {
+  var newMode = currentFacingMode === 'user' ? 'environment' : 'user';
+  startCamera(newMode);
+});
+
+// ===== Value Display =====
+var valsTimer = null;
+function showVals() {
+  document.getElementById('vals').classList.add('show');
+  clearTimeout(valsTimer);
+}
+function hideValsDelayed() {
+  valsTimer = setTimeout(function() {
+    document.getElementById('vals').classList.remove('show');
+  }, 1500);
+}
+
+// ===== Hint =====
+setTimeout(function() {
+  document.getElementById('hint').classList.add('show');
+  setTimeout(function() { document.getElementById('hint').classList.remove('show'); }, 5000);
+}, 600);
+
+// ===== Brightness Tip — show on first load =====
+setTimeout(function() {
+  document.getElementById('brightnessTip').classList.add('show');
+}, 2000);
+document.getElementById('tipClose').addEventListener('click', function() {
+  document.getElementById('brightnessTip').classList.remove('show');
+});
+
+// ===== Wake Lock — keep screen awake =====
+var wakeLock = null;
+function requestWakeLock() {
+  if ('wakeLock' in navigator) {
+    navigator.wakeLock.request('screen').then(function(lock) {
+      wakeLock = lock;
+    }).catch(function() {});
+  }
+}
+requestWakeLock();
+// Re-acquire on visibility change
+document.addEventListener('visibilitychange', function() {
+  if (wakeLock !== null && document.visibilityState === 'visible') {
+    requestWakeLock();
+  }
+});
+
+// ===== Init =====
+update();
+startCamera('user');
+
+// ===== Service Worker Registration =====
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js').catch(function(err) {
+      console.log('SW registration failed:', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
