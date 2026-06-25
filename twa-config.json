@@ -1,8 +1,8 @@
 {
   "packageId": "com.ringlight.app",
   "host": "drgonw1021-lgtm.github.io",
-  "name": "RingLight 补光镜",
-  "launcherName": "RingLight",
+  "name": "补光照相机",
+  "launcherName": "补光照相机",
   "display": "standalone",
   "orientation": "portrait",
   "themeColor": "#1a1410",
