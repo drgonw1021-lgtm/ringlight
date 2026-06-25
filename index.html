@@ -481,42 +481,42 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;
 }
 .pm-steps b{color:rgba(255,230,200,0.7)}
 
-/* Activation code input */
-.pm-activate-section{
+/* Unlock button */
+.pm-unlock-section{
   margin-top:18px;padding-top:18px;
   border-top:1px solid rgba(255,220,180,0.06);
 }
-.pm-activate-title{
-  font-size:13px;color:rgba(255,230,200,0.6);text-align:center;
-  margin-bottom:12px;
-}
-.pm-code-input-wrap{
-  display:flex;gap:8px;justify-content:center;
-}
-.pm-code-input{
-  width:100%;max-width:240px;
-  padding:12px 16px;border-radius:14px;
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,220,180,0.12);
-  color:#fff;font-size:15px;letter-spacing:2px;
-  text-align:center;outline:none;
-  transition:border-color .2s;
-}
-.pm-code-input::placeholder{color:rgba(255,255,255,0.2);letter-spacing:0}
-.pm-code-input:focus{border-color:rgba(255,215,0,0.4)}
-.pm-activate-btn{
-  padding:12px 24px;border-radius:14px;border:none;
+.pm-unlock-btn{
+  width:100%;padding:16px;border-radius:16px;border:none;
   background:linear-gradient(135deg,#ffd700,#ffb347);
-  color:#1a1410;font-size:14px;font-weight:600;
-  cursor:pointer;white-space:nowrap;transition:all .2s;
+  color:#1a1410;font-size:16px;font-weight:700;letter-spacing:1px;
+  cursor:pointer;transition:all .2s;
+  box-shadow:0 8px 24px rgba(255,200,80,0.15);
 }
-.pm-activate-btn:active{transform:scale(0.95)}
-.pm-msg{
-  text-align:center;font-size:12px;margin-top:10px;
-  min-height:18px;transition:opacity .3s;
+.pm-unlock-btn:active{transform:scale(0.97)}
+.pm-unlock-hint{
+  text-align:center;font-size:11px;color:rgba(255,220,180,0.3);
+  margin-top:10px;line-height:1.6;
 }
-.pm-msg.error{color:#ff7070}
-.pm-msg.success{color:#70ff90}
+.pm-confirm{
+  text-align:center;padding:8px 0;
+}
+.pm-confirm p{
+  font-size:14px;color:rgba(255,230,200,0.8);margin-bottom:20px;
+}
+.pm-confirm-btns{display:flex;gap:10px;justify-content:center}
+.pm-confirm-btns button{
+  padding:12px 28px;border-radius:14px;border:none;
+  font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;
+}
+.pm-btn-cancel{
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);
+}
+.pm-btn-cancel:active{transform:scale(0.95)}
+.pm-btn-confirm{
+  background:linear-gradient(135deg,#ffd700,#ffb347);color:#1a1410;
+}
+.pm-btn-confirm:active{transform:scale(0.95)}
 
 /* Already activated state */
 .pm-activated{text-align:center}
@@ -647,7 +647,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;
     <div class="pro-modal-box">
       <button class="pm-close" id="pmClose">&times;</button>
 
-      <!-- Not activated: show payment + activation -->
+      <!-- Not activated: show payment + unlock -->
       <div id="pmPayContent">
         <div class="pm-header">
           <div class="pm-icon">&#9733;</div>
@@ -662,26 +662,31 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;
         </ul>
 
         <div class="pm-pay-section">
-          <div class="pm-price"><span>&yen;</span>68<span> / 永久</span></div>
+          <div class="pm-price"><span>&yen;</span>1.99<span> / 永久</span></div>
           <div class="pm-price-label">一次购买，永久使用，无需订阅</div>
           <div class="pm-qr-wrap">
             <img src="alipay-qr-code.jpg" alt="支付宝收款码">
           </div>
           <div class="pm-steps">
             <b>1.</b> 扫码或长按保存收款码<br>
-            <b>2.</b> 用支付宝扫码付款 &yen;68<br>
-            <b>3.</b> 联系卖家获取激活码<br>
-            <b>4.</b> 在下方输入激活码即可
+            <b>2.</b> 用支付宝扫码付款 &yen;1.99<br>
+            <b>3.</b> 付款后点击下方按钮即可解锁
           </div>
         </div>
 
-        <div class="pm-activate-section">
-          <div class="pm-activate-title">已有激活码？直接输入：</div>
-          <div class="pm-code-input-wrap">
-            <input type="text" class="pm-code-input" id="codeInput" placeholder="输入激活码" maxlength="19" autocomplete="off">
-            <button class="pm-activate-btn" id="btnActivate">激活</button>
+        <div class="pm-unlock-section" id="pmUnlockSection">
+          <button class="pm-unlock-btn" id="btnUnlock">已完成付款，解锁 Pro</button>
+          <div class="pm-unlock-hint">付款后点击此按钮即可永久解锁全部功能</div>
+        </div>
+
+        <div class="pm-unlock-section" id="pmConfirmSection" style="display:none">
+          <div class="pm-confirm">
+            <p>确认已完成付款？</p>
+            <div class="pm-confirm-btns">
+              <button class="pm-btn-cancel" id="btnUnlockCancel">取消</button>
+              <button class="pm-btn-confirm" id="btnUnlockConfirm">确认解锁</button>
+            </div>
           </div>
-          <div class="pm-msg" id="pmMsg"></div>
         </div>
       </div>
 
@@ -1234,104 +1239,31 @@ document.addEventListener('visibilitychange', function() {
 
 // ===== Pro Membership System =====
 var PRO = {
-  isActivated: false,
-  secretKey: 'RingLight2026-Pro',
-  // Valid code format: XXXX-XXXX-XXXX where X = alphanumeric (12 chars + 2 dashes = 14)
+  isActivated: false
 };
 
 function checkProStatus() {
-  var saved = localStorage.getItem('ringlight_pro');
-  if (!saved) { PRO.isActivated = false; return; }
-  // Validate saved code still matches checksum
-  if (validateActivationCode(saved)) {
-    PRO.isActivated = true;
-    localStorage.setItem('ringlight_pro', saved);
-  } else {
-    PRO.isActivated = false;
-    localStorage.removeItem('ringlight_pro');
-  }
+  PRO.isActivated = localStorage.getItem('ringlight_pro') === 'unlocked';
 }
 
-// Simple but effective activation code validation
-// Format: XXXX-XXXX-XXXX, validated by a checksum algorithm
-function validateActivationCode(code) {
-  if (!code || typeof code !== 'string') return false;
-  code = code.trim().toUpperCase();
-  if (!/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) return false;
-
-  // Remove dashes and compute checksum
-  var chars = code.replace(/-/g, '');
-  var sum = 0;
-  for (var i = 0; i < 12; i++) {
-    sum += chars.charCodeAt(i) * (i + 1);
-  }
-  // Checksum: the last digit of sum must be in valid set (this is deterministic)
-  // We use a simple approach: any code that produces a specific pattern is valid
-  // For real security, you'd use a server-side check, but this works for a small app
-
-  // Use HMAC-like verification with secret key
-  var expected = computeCodeHash(chars);
-  return expected;
-}
-
-function computeCodeHash(chars) {
-  // Deterministic hash based on our secret key + code chars
-  // Returns true if the code was generated with our generator tool
-  var key = PRO.secretKey;
-  var hash = 0;
-  for (var i = 0; i < chars.length; i++) {
-    hash = ((hash << 5) - hash) + chars.charCodeAt(i) + key.charCodeAt(i % key.length);
-    hash = hash & hash; // Convert to 32bit int
-  }
-  // The hash mod 7 must equal 0 for valid codes (our generator ensures this)
-  return (hash % 7 === 0 || hash % 13 === 0);
-}
-
-function activateCode(codeInput) {
-  var code = codeInput.value.trim().toUpperCase();
-  var msgEl = document.getElementById('pmMsg');
-
-  if (!code) {
-    msgEl.textContent = '请输入激活码';
-    msgEl.className = 'pm-msg error';
-    msgEl.style.opacity = '1';
-    return false;
-  }
-
-  if (!/^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) {
-    msgEl.textContent = '格式错误，应为 XXXX-XXXX-XXXX';
-    msgEl.className = 'pm-msg error';
-    msgEl.style.opacity = '1';
-    return false;
-  }
-
-  if (validateActivationCode(code)) {
-    PRO.isActivated = true;
-    localStorage.setItem('ringlight_pro', code);
-    msgEl.textContent = '\u2705 激活成功！所有高级功能已解锁';
-    msgEl.className = 'pm-msg success';
-    msgEl.style.opacity = '1';
-
-    updateProUI();
-    setTimeout(function() { closeProModal(); }, 1200);
-    return true;
-  } else {
-    msgEl.textContent = '\u274C 激活码无效，请联系卖家确认';
-    msgEl.className = 'pm-msg error';
-    msgEl.style.opacity = '1';
-    return false;
-  }
+function unlockPro() {
+  PRO.isActivated = true;
+  localStorage.setItem('ringlight_pro', 'unlocked');
+  updateProUI();
+  // Show activated content
+  document.getElementById('pmPayContent').style.display = 'none';
+  document.getElementById('pmActivatedContent').style.display = 'block';
+  // Auto close after 1.5s
+  setTimeout(function() { closeProModal(); }, 1500);
 }
 
 function updateProUI() {
   var badge = document.getElementById('proBadge');
   var btnPro = document.getElementById('btnPro');
-  var brandName = document.getElementById('brandName');
 
   if (PRO.isActivated) {
     badge.style.display = 'inline-flex';
     btnPro.classList.add('on');
-    // Show pay content or activated content in modal
     document.getElementById('pmPayContent').style.display = 'none';
     document.getElementById('pmActivatedContent').style.display = 'block';
   } else {
@@ -1339,11 +1271,13 @@ function updateProUI() {
     btnPro.classList.remove('on');
     document.getElementById('pmPayContent').style.display = 'block';
     document.getElementById('pmActivatedContent').style.display = 'none';
+    // Reset unlock section
+    document.getElementById('pmUnlockSection').style.display = 'block';
+    document.getElementById('pmConfirmSection').style.display = 'none';
   }
 
   // Update brightness max based on pro status
   BMAX = PRO.isActivated ? 180 : 150;
-  // Clamp current brightness to new max
   S.brightness = Math.min(S.brightness, BMAX);
 
   // Watermark visibility
@@ -1364,10 +1298,11 @@ function canUseColorWheel() {
 function showProModal() {
   var modal = document.getElementById('proModal');
   modal.classList.add('show');
-  // Clear previous input
-  document.getElementById('codeInput').value = '';
-  document.getElementById('pmMsg').textContent = '';
-  document.getElementById('pmMsg').style.opacity = '0';
+  // Reset to unlock section
+  if (!PRO.isActivated) {
+    document.getElementById('pmUnlockSection').style.display = 'block';
+    document.getElementById('pmConfirmSection').style.display = 'none';
+  }
 }
 
 function closeProModal() {
@@ -1382,13 +1317,19 @@ document.getElementById('btnPro').addEventListener('click', function(e) {
 document.getElementById('proModalBg').addEventListener('click', closeProModal);
 document.getElementById('pmClose').addEventListener('click', closeProModal);
 
-document.getElementById('btnActivate').addEventListener('click', function() {
-  activateCode(document.getElementById('codeInput'));
+// Unlock button flow: tap → confirm → unlock
+document.getElementById('btnUnlock').addEventListener('click', function() {
+  document.getElementById('pmUnlockSection').style.display = 'none';
+  document.getElementById('pmConfirmSection').style.display = 'block';
 });
 
-// Allow Enter key to submit activation code
-document.getElementById('codeInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') activateCode(this);
+document.getElementById('btnUnlockCancel').addEventListener('click', function() {
+  document.getElementById('pmConfirmSection').style.display = 'none';
+  document.getElementById('pmUnlockSection').style.display = 'block';
+});
+
+document.getElementById('btnUnlockConfirm').addEventListener('click', function() {
+  unlockPro();
 });
 
 // ===== Gate color wheel for free users =====
