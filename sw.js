@@ -1,10 +1,16 @@
 // RingLight Service Worker — cache-first strategy
-var CACHE_NAME = 'ringlight-v1';
+var CACHE_NAME = 'ringlight-v2';
 var ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon.svg'
+  './icon.svg',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-192.png',
+  './icon-maskable-512.png',
+  './apple-touch-icon.png',
+  './favicon-32.png'
 ];
 
 // Install: cache core assets
