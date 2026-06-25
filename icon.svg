@@ -1,26 +1,75 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <radialGradient id="bg" cx="50%" cy="45%" r="55%">
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
       <stop offset="0%" stop-color="#1a1410"/>
-      <stop offset="70%" stop-color="#0d0a08"/>
-      <stop offset="100%" stop-color="#060403"/>
+      <stop offset="100%" stop-color="#080604"/>
     </radialGradient>
     <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fff5e0"/>
-      <stop offset="35%" stop-color="#ffd49a"/>
-      <stop offset="70%" stop-color="#ffb060"/>
-      <stop offset="100%" stop-color="#ff9040"/>
+      <stop offset="0%" stop-color="#FFE8C8"/>
+      <stop offset="50%" stop-color="#FFD89B"/>
+      <stop offset="100%" stop-color="#FFA947"/>
     </linearGradient>
+    <radialGradient id="lens" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#2a2445"/>
+      <stop offset="70%" stop-color="#14101e"/>
+      <stop offset="100%" stop-color="#0a0814"/>
+    </radialGradient>
     <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="10" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
     </filter>
+    <filter id="halo" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="35" result="blur"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.6"/></feComponentTransfer>
+    </filter>
+    <clipPath id="round">
+      <rect x="2" y="2" width="508" height="508" rx="115" ry="115"/>
+    </clipPath>
   </defs>
-  <rect width="512" height="512" fill="url(#bg)" rx="112"/>
-  <circle cx="256" cy="256" r="155" fill="none" stroke="url(#ring)" stroke-width="38" filter="url(#glow)" opacity="0.9"/>
-  <circle cx="256" cy="256" r="155" fill="none" stroke="#fff5e0" stroke-width="2" opacity="0.25"/>
-  <circle cx="256" cy="256" r="120" fill="none" stroke="#ffd49a" stroke-width="1" opacity="0.15"/>
+
+  <!-- Background -->
+  <rect x="2" y="2" width="508" height="508" rx="115" ry="115" fill="url(#bg)"/>
+
+  <!-- Ring light glow halo -->
+  <g clip-path="url(#round)">
+    <!-- Outer halo -->
+    <circle cx="256" cy="256" r="190" fill="none"
+            stroke="rgba(255,215,140,0.35)" stroke-width="40" filter="url(#halo)"/>
+
+    <!-- Inner glow spill -->
+    <circle cx="256" cy="256" r="155" fill="none"
+            stroke="rgba(255,220,150,0.15)" stroke-width="20"/>
+
+    <!-- Ring light band (the main ring) -->
+    <circle cx="256" cy="256" r="185" fill="none"
+            stroke="url(#ring)" stroke-width="22" filter="url(#glow)" opacity="0.95"/>
+
+    <!-- Bright core of ring -->
+    <circle cx="256" cy="256" r="185" fill="none"
+            stroke="#FFF0D8" stroke-width="10" opacity="0.7"/>
+
+    <!-- Lens barrel edge (metallic ring) -->
+    <circle cx="256" cy="256" r="152" fill="none"
+            stroke="#b09a80" stroke-width="3" opacity="0.9"/>
+
+    <!-- Camera lens glass -->
+    <circle cx="256" cy="256" r="147" fill="url(#lens)"/>
+
+    <!-- Aperture hexagon hint -->
+    <polygon points="256,200 295,225 295,275 256,300 217,275 217,225"
+             fill="none" stroke="rgba(255,210,140,0.12)" stroke-width="1.5"/>
+
+    <!-- Pupil (darkest center) -->
+    <circle cx="256" cy="256" r="32" fill="#060308" opacity="0.85"/>
+
+    <!-- Main lens highlight (upper-left reflection) -->
+    <ellipse cx="208" cy="208" rx="38" ry="28" fill="rgba(255,245,220,0.25)"
+             transform="rotate(-15 208 208)"/>
+
+    <!-- Specular highlight (small bright spot) -->
+    <circle cx="212" cy="205" r="12" fill="rgba(255,250,235,0.45)"/>
+
+    <!-- Tiny sparkle -->
+    <circle cx="222" cy="218" r="3" fill="rgba(255,255,255,0.6)"/>
+  </g>
 </svg>

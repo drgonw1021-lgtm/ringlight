@@ -1,5 +1,4 @@
-// RingLight Service Worker — cache-first strategy
-var CACHE_NAME = 'ringlight-v2';
+var CACHE_NAME = 'ringlight-v3';
 var ASSETS = [
   './',
   './index.html',
@@ -10,61 +9,38 @@ var ASSETS = [
   './icon-maskable-192.png',
   './icon-maskable-512.png',
   './apple-touch-icon.png',
-  './favicon-32.png'
+  './favicon-32.png',
+  './privacy-policy.html'
 ];
 
-// Install: cache core assets
-self.addEventListener('install', function(event) {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
-      return cache.addAll(ASSETS);
-    }).then(function() {
-      return self.skipWaiting();
-    })
-  );
+self.addEventListener('install', function(e) {
+  e.waitUntil(caches.open(CACHE_NAME).then(function(cache) {
+    return cache.addAll(ASSETS);
+  }));
 });
 
-// Activate: clean up old caches
-self.addEventListener('activate', function(event) {
-  event.waitUntil(
-    caches.keys().then(function(names) {
-      return Promise.all(
-        names.filter(function(name) {
-          return name !== CACHE_NAME;
-        }).map(function(name) {
-          return caches.delete(name);
-        })
-      );
-    }).then(function() {
-      return self.clients.claim();
-    })
-  );
-});
-
-// Fetch: cache-first, fallback to network
-self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    caches.match(event.request).then(function(response) {
-      if (response) {
-        return response;
-      }
-      return fetch(event.request).then(function(networkResponse) {
-        // Cache successful responses for same-origin requests
-        if (networkResponse && networkResponse.status === 200 &&
-            event.request.url.startsWith(self.location.origin)) {
-          var responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then(function(cache) {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return networkResponse;
+self.addEventListener('fetch', function(e) {
+  e.respondWith(
+    caches.match(e.request).then(function(r) {
+      return r || fetch(e.request).then(function(resp) {
+        var clone = resp.clone();
+        caches.open(CACHE_NAME).then(function(c) { c.put(e.request, clone); });
+        return resp;
       }).catch(function() {
-        // Offline fallback — return cached index.html for navigation requests
-        if (event.request.mode === 'navigate') {
+        if (e.request.destination === 'document') {
           return caches.match('./index.html');
         }
-        return new Response('', { status: 503, statusText: 'Offline' });
       });
+    })
+  );
+});
+
+self.addEventListener('activate', function(e) {
+  e.waitUntil(
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.filter(function(k) {
+        return k !== CACHE_NAME;
+      }).map(function(k) { return caches.delete(k); }));
     })
   );
 });
