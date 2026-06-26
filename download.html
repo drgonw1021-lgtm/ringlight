@@ -78,41 +78,43 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
 }
 @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
 
-/* ===== App Screenshots ===== */
+/* ===== App Gallery - Lifestyle Scenes ===== */
 .gallery{
-  padding:60px 20px 40px;max-width:600px;margin:0 auto;
+  padding:70px 20px 50px;max-width:700px;margin:0 auto;
 }
 .gallery-title{
-  font-size:24px;font-weight:600;color:#ffe0c0;text-align:center;
-  margin-bottom:8px;letter-spacing:1px;
+  font-size:26px;font-weight:700;color:#ffe0c0;text-align:center;
+  margin-bottom:6px;letter-spacing:2px;
 }
 .gallery-sub{
-  font-size:14px;color:rgba(255,220,180,0.4);text-align:center;margin-bottom:36px;
+  font-size:14px;color:rgba(255,220,180,0.4);text-align:center;margin-bottom:40px;
 }
-.shot-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+.scene-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
 }
-.shot-item{
-  border-radius:16px;overflow:hidden;position:relative;
-  border:1px solid rgba(255,220,180,0.1);
-  aspect-ratio:9/19.3;
-  transition:transform .2s;
+.scene-item{
+  border-radius:20px;overflow:hidden;position:relative;
+  border:1px solid rgba(255,220,180,0.08);
+  background:#12100e;
+  transition:transform .25s;
 }
-.shot-item:active{transform:scale(0.97)}
-.shot-item img{
+.scene-item:active{transform:scale(0.97)}
+.scene-item.hero{
+  grid-row:span 2;
+}
+.scene-item.full{
+  grid-column:span 2;
+}
+.scene-item img{
   width:100%;height:100%;object-fit:cover;display:block;
 }
-.shot-item .shot-label{
+.scene-item .scene-label{
   position:absolute;bottom:0;left:0;right:0;
-  padding:16px 10px 8px;
-  background:linear-gradient(transparent,rgba(0,0,0,0.75));
-  font-size:11px;color:rgba(255,230,200,0.85);
-  text-align:center;letter-spacing:0.5px;font-weight:500;
+  padding:22px 14px 12px;
+  background:linear-gradient(transparent,rgba(0,0,0,0.82));
+  font-size:13px;color:rgba(255,240,220,0.9);
+  text-align:center;letter-spacing:1px;font-weight:500;
 }
-.shot-item.wide{grid-column:span 3;aspect-ratio:auto}
-.shot-item.wide .shot-row{display:flex;gap:0;align-items:stretch}
-.shot-item.wide .shot-row img{flex:1;aspect-ratio:9/19.3}
-.shot-item.wide .shot-label{position:relative;background:rgba(0,0,0,0.6);padding:8px}
 
 /* ===== Features ===== */
 .features{
@@ -198,12 +200,9 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
 @media(max-width:480px){
   .hero h1{font-size:30px}
   .feature-grid{grid-template-columns:1fr}
-  .gallery-grid{grid-template-columns:1fr}
-  .gallery-item.tall{grid-row:span 1}
-  .gallery-item.full{grid-column:span 1}
-  .gallery-item img{max-height:320px}
-  .shot-grid{grid-template-columns:1fr 1fr}
-  .shot-item.wide{grid-column:span 2}
+  .scene-grid{grid-template-columns:1fr}
+  .scene-item.hero{grid-row:span 1}
+  .scene-item.full{grid-column:span 1}
 }
 </style>
 </head>
@@ -236,34 +235,30 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
   <div class="scroll-hint">向下滚动了解功能 ↓</div>
 </section>
 
-<!-- ===== App Screenshots ===== -->
+<!-- ===== App Gallery - Lifestyle Scenes ===== -->
 <section class="gallery">
-  <h2 class="gallery-title">真实界面 · 所见即所得</h2>
-  <p class="gallery-sub">以下均为 App 真实截图，非效果图</p>
-  <div class="shot-grid">
-    <div class="shot-item">
-      <img src="promo-images/app-light-off.png" alt="补光前">
-      <div class="shot-label">补光前</div>
+  <h2 class="gallery-title">看见光的力量</h2>
+  <p class="gallery-sub">真实使用场景 · 屏幕即补光灯</p>
+  <div class="scene-grid">
+    <div class="scene-item hero">
+      <img src="promo-images/ai-scene-selfie-warm.png" alt="手持自拍暖光模式">
+      <div class="scene-label">暖光自拍 · 随时随地</div>
     </div>
-    <div class="shot-item">
-      <img src="promo-images/app-warm-light.png" alt="暖光补光">
-      <div class="shot-label">暖光补光</div>
+    <div class="scene-item">
+      <img src="promo-images/ai-scene-phone-closeup.png" alt="手机特写灯管发光">
+      <div class="scene-label">边框灯管 · 产品质感</div>
     </div>
-    <div class="shot-item">
-      <img src="promo-images/app-cool-light.png" alt="冷光补光">
-      <div class="shot-label">冷光补光</div>
+    <div class="scene-item">
+      <img src="promo-images/ai-scene-vanity-pink.png" alt="梳妆台粉色色环">
+      <div class="scene-label">色环选色 · 百变氛围</div>
     </div>
-    <div class="shot-item">
-      <img src="promo-images/app-color-wheel.png" alt="色环选色">
-      <div class="shot-label">色环选色</div>
+    <div class="scene-item full">
+      <img src="promo-images/ai-scene-before-after.png" alt="前后对比效果">
+      <div class="scene-label">一键开灯 · 暗光救星</div>
     </div>
-    <div class="shot-item">
-      <img src="promo-images/app-beauty-panel.png" alt="美颜面板">
-      <div class="shot-label">美颜面板</div>
-    </div>
-    <div class="shot-item">
-      <img src="promo-images/app-pro-mode.png" alt="Pro 超亮模式">
-      <div class="shot-label">Pro 超亮模式</div>
+    <div class="scene-item full">
+      <img src="promo-images/ai-scene-flatlay.png" alt="平铺摆拍">
+      <div class="scene-label">你的随身化妆镜</div>
     </div>
   </div>
 </section>
