@@ -3,3 +3,16 @@ Thumbs.db
 node_modules/
 *.log
 pwabuilder-package/
+# Dev/build tools - not needed on website
+_shot-*.html
+_gen_*.py
+_promo-composite.html
+mockup-generator.html
+mockup-shots.html
+code-generator.html
+promo-images/_test_*.png
+promo-images/ai-scene-*.png
+promo-images/app-warm-portrait.png
+promo-images/_debug_*.png
+promo-scenes/_debug_*.png
+social-cards/

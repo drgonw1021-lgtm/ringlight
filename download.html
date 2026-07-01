@@ -178,6 +178,23 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
   background:rgba(100,255,150,0.12);color:#70ff90;
   display:flex;align-items:center;justify-content:center;font-size:11px;
 }
+/* Pay QR section */
+.pay-section{
+  margin-top:24px;padding-top:20px;
+  border-top:1px solid rgba(255,220,180,0.08);
+}
+.pay-section .pay-qr-wrap{
+  background:#fff;border-radius:16px;padding:12px;
+  display:inline-block;margin:12px 0 8px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+.pay-section .pay-qr-wrap img{width:180px;height:180px;display:block;border-radius:10px}
+.pay-steps{
+  font-size:13px;color:rgba(255,220,180,0.4);line-height:1.9;
+  text-align:left;margin:16px 0;padding:0 8px;
+}
+.pay-steps b{color:rgba(255,230,200,0.7)}
+
 .btn-buy{
   display:block;width:100%;padding:16px;border-radius:16px;border:none;
   background:linear-gradient(135deg,#ffd700,#ffb347);color:#1a1410;
@@ -186,6 +203,13 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
   transition:transform .15s;
 }
 .btn-buy:active{transform:scale(0.97)}
+.btn-free{
+  display:block;width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,220,180,0.15);
+  background:rgba(255,220,180,0.06);color:rgba(255,230,200,0.6);
+  font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;
+  text-align:center;margin-top:10px;transition:transform .15s;
+}
+.btn-free:active{transform:scale(0.97)}
 
 /* ===== Footer ===== */
 .footer{
@@ -203,6 +227,7 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
   .scene-grid{grid-template-columns:1fr}
   .scene-item.hero{grid-row:span 1}
   .scene-item.full{grid-column:span 1}
+  .pay-section .pay-qr-wrap img{width:150px;height:150px}
 }
 </style>
 </head>
@@ -241,24 +266,24 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
   <p class="gallery-sub">真实使用场景 · 屏幕即补光灯</p>
   <div class="scene-grid">
     <div class="scene-item hero">
-      <img src="promo-images/ai-scene-selfie-warm.png" alt="手持自拍暖光模式">
-      <div class="scene-label">暖光自拍 · 随时随地</div>
+      <img src="promo-scenes/scene-1.png" alt="暖光补光模式">
+      <div class="scene-label">暖光补光 · 柔和自然</div>
     </div>
     <div class="scene-item">
-      <img src="promo-images/ai-scene-phone-closeup.png" alt="手机特写灯管发光">
-      <div class="scene-label">边框灯管 · 产品质感</div>
+      <img src="promo-scenes/scene-2.png" alt="冷光补光模式">
+      <div class="scene-label">冷光补光 · 清透显白</div>
     </div>
     <div class="scene-item">
-      <img src="promo-images/ai-scene-vanity-pink.png" alt="梳妆台粉色色环">
-      <div class="scene-label">色环选色 · 百变氛围</div>
+      <img src="promo-scenes/scene-3.png" alt="色环选色模式">
+      <div class="scene-label">色环选色 · 气质随心</div>
+    </div>
+    <div class="scene-item">
+      <img src="promo-scenes/scene-4.png" alt="智能美颜模式">
+      <div class="scene-label">智能美颜 · 自然无痕</div>
     </div>
     <div class="scene-item full">
-      <img src="promo-images/ai-scene-before-after.png" alt="前后对比效果">
-      <div class="scene-label">一键开灯 · 暗光救星</div>
-    </div>
-    <div class="scene-item full">
-      <img src="promo-images/ai-scene-flatlay.png" alt="平铺摆拍">
-      <div class="scene-label">你的随身化妆镜</div>
+      <img src="promo-scenes/scene-compare.png" alt="前后对比效果">
+      <div class="scene-label">一键开灯 · 从暗淡到动人</div>
     </div>
   </div>
 </section>
@@ -271,17 +296,22 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
     <div class="feature-card">
       <div class="feature-icon">🔦</div>
       <h3>化妆镜灯管</h3>
-      <p>屏幕边框即环形补光灯，复古灯管形态，模拟真实化妆镜</p>
+      <p>屏幕边框即环形补光灯，四边灯管形态，模拟真实化妆镜</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">☀️</div>
+      <h3>亮度调节</h3>
+      <p>上下滑动调亮度，5%~180% 随心掌控，开灯就是影棚</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon">🎨</div>
       <h3>色环选色</h3>
-      <p>手指在灯键上转圈，像调色盘一样选任意颜色</p>
+      <p>指尖滑动色环，百种色彩随心选，打造个性光影</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon">🌡️</div>
       <h3>色温调节</h3>
-      <p>左右滑动调色温，从超暖到冷白，找你的专属光</p>
+      <p>左右滑动调色温，从暖金到冷白，找你的专属光</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon">✨</div>
@@ -293,29 +323,37 @@ body{font-family:-apple-system,"SF Pro Display","PingFang SC","Microsoft YaHei",
       <h3>一键拍照</h3>
       <p>自动合成补光效果，照片自带柔光滤镜感</p>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">🔄</div>
-      <h3>前后切换</h3>
-      <p>前置补光自拍、后置补光拍摄，一键切换</p>
-    </div>
   </div>
 </section>
 
 <!-- ===== Pricing ===== -->
 <section class="pricing">
-  <h2 class="section-title">解锁全部功能</h2>
+  <h2 class="section-title">解锁 Pro 全部功能</h2>
   <p class="section-sub">一次购买，永久使用</p>
   <div class="price-card">
     <div class="badge">PRO 永久版</div>
     <div class="price"><span class="currency">¥</span>1.99<span class="unit"> / 永久</span></div>
-    <p class="price-desc">不到一杯水的价格，永久解锁全部高级功能</p>
+    <p class="price-desc">不到一杯奶茶的价格，永久解锁全部高级功能</p>
     <ul class="price-features">
       <li><span class="check">✓</span> 色环选色 — 任意颜色随心调</li>
       <li><span class="check">✓</span> 无水印拍照 — 照片纯净无标识</li>
       <li><span class="check">✓</span> 超亮模式 — 亮度提升至 180%</li>
       <li><span class="check">✓</span> 全量美颜 — 磨皮美白大眼瘦脸全开</li>
     </ul>
-    <a href="https://drgonw1021-lgtm.github.io/ringlight/" class="btn-buy">立即体验</a>
+
+    <div class="pay-section">
+      <div class="pay-qr-wrap">
+        <img src="alipay-qr-code.jpg" alt="支付宝付款码">
+      </div>
+      <div class="pay-steps">
+        <b>1.</b> 扫码或长按保存收款码<br>
+        <b>2.</b> 用支付宝扫码付款 ¥1.99<br>
+        <b>3.</b> 打开网页版或 APK → 进入 Pro 页面 → 点击「确认解锁」
+      </div>
+    </div>
+
+    <a href="https://drgonw1021-lgtm.github.io/ringlight/" class="btn-buy">打开网页版解锁 Pro</a>
+    <a href="https://github.com/drgonw1021-lgtm/ringlight/releases/download/v1.0.0/ringlight-camera-v1.0.0.apk" class="btn-free">下载 APK 后解锁</a>
   </div>
 </section>
 
